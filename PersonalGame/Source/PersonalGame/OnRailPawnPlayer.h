@@ -119,4 +119,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
     class USoundBase* ReloadSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class USoundBase* PlayerHitSound;
+
 };

@@ -51,6 +51,15 @@ void AOnRailPawnPlayer::Take_Damage()
 	{
 		Die();
 	}
+	else {
+		
+		if (PlayerHitSound != NULL)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, PlayerHitSound, GetActorLocation());
+		}
+
+	}
+
 }
 
 int AOnRailPawnPlayer::GetHealth() const

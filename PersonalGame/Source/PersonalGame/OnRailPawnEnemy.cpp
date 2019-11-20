@@ -9,6 +9,7 @@
 #include "GameFramework/PlayerController.h"
 #include "OnRailPawnPlayer.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AOnRailPawnEnemy::AOnRailPawnEnemy()
@@ -45,6 +46,10 @@ void AOnRailPawnEnemy::OnShot_Implementation()
 		}
 		else
 		{
+			//if (ZombieHitSound != NULL)
+			//{
+			//	UGameplayStatics::PlaySoundAtLocation(this, ZombieHitSound, GetActorLocation());
+		//	}
 			GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &AOnRailPawnEnemy::EndOnShot, DelayAfterShotTime, false);
 		}
 	}

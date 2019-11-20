@@ -45,9 +45,9 @@ protected:
 		class UCapsuleComponent * CollisionCapsule;
 
 	UPROPERTY(EditAnywhere)
-	int MaxHealth = 10;
+	int32 MaxHealth = 10;
 	UPROPERTY(VisibleAnywhere, Category=State)
-	int CurrentHealth = 5;
+	int32 CurrentHealth = 5;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
 	bool bWasShot = false;
@@ -79,6 +79,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=State)
 	bool bStartedAttackingLoop = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class USoundBase* ZombieHitSound;
+
+	//fd;slakjsal;kjsadf
+	UPROPERTY()
+	int32 foo;
 
 
 };
