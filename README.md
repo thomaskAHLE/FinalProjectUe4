@@ -6,7 +6,7 @@ Jackson Oberkirch<br>
 Thomas Hill<br>
 Jalon Jackson<br>
 
-This is our submission for Assignment #9. (The Path Less Traveled)
+This is our submission for Assignment #9. (The Path Less Traveled)<br>
 It's a continuation of our previous project.
 
 ## Individual Roles:
