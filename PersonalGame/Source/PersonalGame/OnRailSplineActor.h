@@ -37,6 +37,7 @@ public:
 
 	float GetCurrentSpeedMultiplier() const;
 
+	void SetTravelerSpeedMultiplier(float SpeedMultiplier = 1.f);
 //Editor only functions allowing designer to get position and rotation along spline
 #if WITH_EDITOR
 	FRotator GetRotAtIdx(int32& index) const ;
@@ -89,6 +90,7 @@ protected:
 
 	float CurrentSpeedMultiplier = 0.f;
 
+
 	//Array of booleans corresponding to the spline points
 	//Determines whether reaching the spline point at the index should stop movement across the spline
 	UPROPERTY(EditAnywhere)
@@ -99,9 +101,15 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TArray<float> SpeedMultiplierToSplinePoint;
 
+	float TravelingActorSpeedMultiplier = 1.f;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private: 
+	float LastDefaultSpeedMultiplier;
+	
+	UPROPERTY(EditAnywhere)
+	bool EDITOR_ONLY_bUpdateDefaultSpeedMultiplier = false;
 };
