@@ -8,6 +8,7 @@
 #include "OnRailSplineActor.h"
 #include "GameFramework/PlayerController.h"
 #include "OnRailPawnPlayer.h"
+
 #include "Engine/World.h"
 
 
@@ -18,11 +19,10 @@ AOnRailPawnEnemy::AOnRailPawnEnemy()
 
 	CollisionCapsule = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
 	CollisionCapsule->SetupAttachment(SkeletalMesh);
-
 	CollisionCapsule->SetGenerateOverlapEvents(true);
 }
 
-void AOnRailPawnEnemy::OnShot_Implementation()
+void AOnRailPawnEnemy::OnShot_Implementation(float Damage)
 {
 	if (!bIsDead)
 	{
@@ -51,6 +51,21 @@ void AOnRailPawnEnemy::OnShot_Implementation()
 }
 
 
+float AOnRailPawnEnemy::GetEnemyVelocity_Implementation()
+{
+	return GetCurrentVelocity();
+}
+
+bool AOnRailPawnEnemy::IsDead_Implementation()
+{
+	return bIsDead;
+}
+
+bool AOnRailPawnEnemy::WasDamaged_Implementation()
+{
+	return bWasShot;
+}
+
 void AOnRailPawnEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -70,7 +85,7 @@ void AOnRailPawnEnemy::BeginPlay()
 	
 }
 
-void AOnRailPawnEnemy::Attack()
+void AOnRailPawnEnemy::Attack_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Attack"));
 	
@@ -122,7 +137,7 @@ void AOnRailPawnEnemy::StartAttacking()
 	GetWorld()->GetTimerManager().SetTimer(AttackDelayTimerHandle, this, &AOnRailPawnEnemy::Attack, DelayBetweenAttacks, true, 1.f);
 }
 
-void AOnRailPawnEnemy::Die()
+void AOnRailPawnEnemy::Die_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Dying"))
 	bIsDead = true;
@@ -130,6 +145,16 @@ void AOnRailPawnEnemy::Die()
 	bWasShot = false;
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	GetWorld()->GetTimerManager().SetTimer(DeathDelayTimerHandle, this, &AOnRailPawnEnemy::DestroyWrapper, DelayAfterDeathTime, false);
+}
+
+bool AOnRailPawnEnemy::IsAttacking_Implementation()
+{
+	return bIsAttacking;
+}
+
+bool AOnRailPawnEnemy::IsMoving_Implementation()
+{
+	return 0.f < GetEnemyVelocity();
 }
 
 void AOnRailPawnEnemy::DestroyWrapper()

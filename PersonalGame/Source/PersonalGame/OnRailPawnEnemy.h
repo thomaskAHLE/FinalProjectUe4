@@ -5,20 +5,44 @@
 #include "CoreMinimal.h"
 #include "OnRailPawn.h"
 #include "ShootableInterface.h"
+#include "EnemyInterface.h"
 #include "OnRailPawnEnemy.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PERSONALGAME_API AOnRailPawnEnemy : public AOnRailPawn, public IShootableInterface
+class PERSONALGAME_API AOnRailPawnEnemy : public AOnRailPawn, public IShootableInterface, public IEnemyInterface
 {
 	GENERATED_BODY()
 public:
 	AOnRailPawnEnemy();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
-	void OnShot();
-	virtual void OnShot_Implementation() override;
+	void OnShot(float Damage);
+	virtual void OnShot_Implementation(float Damage) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
+		void Attack();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
+		void Die();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
+		bool IsMoving();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
+		bool IsAttacking();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
+		float GetEnemyVelocity();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
+		bool IsDead();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
+		bool WasDamaged();
+
+
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -28,15 +52,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void Attack();
-
 	UFUNCTION(BlueprintCallable)
 	void EndOnShot();
 
 	void StartAttacking();
-
-	void Die();
 
 	UPROPERTY(EditAnywhere)
 		class USkeletalMeshComponent * SkeletalMesh;
@@ -79,6 +98,4 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=State)
 	bool bStartedAttackingLoop = false;
-
-
 };
