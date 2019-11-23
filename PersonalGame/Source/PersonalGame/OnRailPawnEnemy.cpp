@@ -5,10 +5,10 @@
 #include "OnRailPawnEnemy.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "OnRailSplineActor.h"
 #include "GameFramework/PlayerController.h"
 #include "OnRailPawnPlayer.h"
-
+#include "OnRailSplineActor.h"
+#include "EnemyLogicComponent.h"
 #include "Engine/World.h"
 
 
@@ -20,33 +20,15 @@ AOnRailPawnEnemy::AOnRailPawnEnemy()
 	CollisionCapsule = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
 	CollisionCapsule->SetupAttachment(SkeletalMesh);
 	CollisionCapsule->SetGenerateOverlapEvents(true);
+	EnemyLogicComponent = CreateDefaultSubobject<UEnemyLogicComponent>("Logic Component");
+	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AOnRailPawnEnemy::Die);
 }
 
 void AOnRailPawnEnemy::OnShot_Implementation(float Damage)
 {
-	if (!bIsDead)
+	if (EnemyLogicComponent != nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("On Shot"))
-			bWasShot = true;
-		--CurrentHealth;
-		if (RailToFollow != nullptr && RailToFollow->IsMoving())
-		{
-			RailToFollow->StopMoving();
-		}
-		if (bStartedAttackingLoop)
-		{
-			bIsAttacking = false;
-			GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
-		}
-		//Play animation or something
-		if (CurrentHealth <= 0)
-		{
-			Die();
-		}
-		else
-		{
-			GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &AOnRailPawnEnemy::EndOnShot, DelayAfterShotTime, false);
-		}
+		EnemyLogicComponent->TakeDamageFromPlayer(Damage);
 	}
 }
 
@@ -87,23 +69,10 @@ void AOnRailPawnEnemy::BeginPlay()
 
 void AOnRailPawnEnemy::Attack_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Attack"));
-	
-	//I Hate this implementation, but I can't think of a better way right now.
-	UWorld const * World = GetWorld();
-	if (World != nullptr)
+	if (EnemyLogicComponent != nullptr)
 	{
-		APlayerController * PC = World->GetFirstPlayerController();
-		if (PC != nullptr)
-		{
-			AOnRailPawnPlayer * Player = Cast<AOnRailPawnPlayer>(PC->GetPawn());
-			if (Player)
-			{
-				Player->Take_Damage();
-			}
-		}
+		EnemyLogicComponent->AttackPlayer();
 	}
-
 }
 
 void AOnRailPawnEnemy::EndOnShot()

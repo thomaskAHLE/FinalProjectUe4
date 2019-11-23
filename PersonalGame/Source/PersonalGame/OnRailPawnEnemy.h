@@ -55,6 +55,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void EndOnShot();
 
+
 	void StartAttacking();
 
 	UPROPERTY(EditAnywhere)
@@ -62,6 +63,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		class UCapsuleComponent * CollisionCapsule;
+
+	UPROPERTY(EditAnywhere)
+	class UEnemyLogicComponent * EnemyLogicComponent;
 
 	UPROPERTY(EditAnywhere)
 	int MaxHealth = 10;

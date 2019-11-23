@@ -27,11 +27,20 @@ void UEnemyLogicComponent::BeginPlay()
 	{
 		ActorToAttack = GetWorld()->GetFirstPlayerController()->GetPawn();
 	}
+	if (ActorToAttack != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Has Actor To Attack"))
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Has No Actor To Attack"))
+	}
 }
 
 
 void UEnemyLogicComponent::AttackPlayer()
 {
+	bIsAttacking = true;
 	if (ActorToAttack != nullptr)
 	{
 		FDamageEvent DamageEvent;
@@ -46,17 +55,13 @@ void UEnemyLogicComponent::AttackPlayer()
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s has no actor To attack"), *GetName());
 	}
+	bIsAttacking = false;
 }
 
-void UEnemyLogicComponent::StartAttackingLoop()
-{
-	bStartedAttackingLoop = true;
-	
-}
 
 void UEnemyLogicComponent::TakeDamageFromPlayer(float Damage /*=1.f*/)
 {
-	UE_LOG(LogTemp, Error, TEXT("On Shot"))
+	UE_LOG(LogTemp, Error, TEXT("Took Damage from player"))
 		bWasShot = true;
 	--CurrentHealth;
 	
@@ -68,6 +73,7 @@ void UEnemyLogicComponent::TakeDamageFromPlayer(float Damage /*=1.f*/)
 	//Play animation or something
 	if (CurrentHealth <= 0)
 	{
+		bIsDead = true;
 		Die();
 	}
 	else
@@ -83,6 +89,11 @@ void UEnemyLogicComponent::EndTookDamageFromPlayer()
 
 void UEnemyLogicComponent::Die()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Dead"))
+	if (EnemyLogicComponent_Die.IsBound())
+	{
+		EnemyLogicComponent_Die.Broadcast();
+	}
 }
 
 

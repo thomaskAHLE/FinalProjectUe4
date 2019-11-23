@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "EnemyLogicComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDieSignature);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PERSONALGAME_API UEnemyLogicComponent : public UActorComponent
@@ -16,6 +17,14 @@ public:
 	// Sets default values for this component's properties
 	UEnemyLogicComponent();
 
+	UFUNCTION()
+		void AttackPlayer();
+	
+	UPROPERTY(BlueprintAssignable)
+	FDieSignature EnemyLogicComponent_Die;
+
+	UFUNCTION()
+		void TakeDamageFromPlayer(float Damage = 1.f);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -63,14 +72,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Target)
 	class AActor * ActorToAttack = nullptr;
 
-	UFUNCTION()
-	void AttackPlayer();
-
-	UFUNCTION()
-	void StartAttackingLoop();
-
-	UFUNCTION()
-	void TakeDamageFromPlayer(float Damage = 1.f);
 
 	UFUNCTION()
 	void EndTookDamageFromPlayer();
