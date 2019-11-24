@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "EnemyLogicComponent.h"
 #include "EnemyInterface.generated.h"
 
 // This class does not need to be modified.
@@ -42,4 +43,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 	bool WasDamaged();
+
+	
+
+
 };

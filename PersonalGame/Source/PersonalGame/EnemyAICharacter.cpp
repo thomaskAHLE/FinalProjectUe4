@@ -12,7 +12,11 @@ AEnemyAICharacter::AEnemyAICharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	AIControllerClass = AEnemyAIController::StaticClass();
+	EnemyLogicComponent = CreateDefaultSubobject <UEnemyLogicComponent>("Logic Component");
 }
+
+
+
 
 void AEnemyAICharacter::OnShot_Implementation(float Damage)
 {

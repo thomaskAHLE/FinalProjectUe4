@@ -59,37 +59,72 @@ void UEnemyLogicComponent::AttackPlayer()
 }
 
 
+void UEnemyLogicComponent::StartAttackingLoop()
+{
+	bStartedAttackingLoop = true;
+	bIsAttacking = true;
+	UE_LOG(LogTemp, Error, TEXT("Start Attacking Timer"))
+	GetWorld()->GetTimerManager().SetTimer(AttackDelayTimerHandle, this, &UEnemyLogicComponent::AttackPlayer, DelayBetweenAttacks, true, 1.f);
+}
+
 void UEnemyLogicComponent::TakeDamageFromPlayer(float Damage /*=1.f*/)
 {
 	UE_LOG(LogTemp, Error, TEXT("Took Damage from player"))
-		bWasShot = true;
-	--CurrentHealth;
-	
+	bWasShot = true;
+	CurrentHealth -= Damage;
 	if (bStartedAttackingLoop)
 	{
 		bIsAttacking = false;
 		GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
 	}
-	//Play animation or something
 	if (CurrentHealth <= 0)
 	{
-		bIsDead = true;
 		Die();
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &UEnemyLogicComponent::EndTookDamageFromPlayer, DelayAfterShotTime, false);
+		if (EnemyLogicComponent_TookDamage.IsBound())
+		{
+			EnemyLogicComponent_TookDamage.Broadcast(Damage);
+		}
+		GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &UEnemyLogicComponent::PostTookDamageFromPlayer, DelayAfterShotTime, false);
 	}
 }
 
-void UEnemyLogicComponent::EndTookDamageFromPlayer()
+bool UEnemyLogicComponent::GetIsDead() const 
 {
+	return bIsDead;
+}
 
+bool UEnemyLogicComponent::GetWasShot() const
+{
+	return bWasShot;
+}
+
+bool UEnemyLogicComponent::GetIsAttacking() const
+{
+	return bIsAttacking;
+}
+
+void UEnemyLogicComponent::PostTookDamageFromPlayer()
+{
+	bWasShot = false;
+	if (EnemyLogicComponent_PostTookDamage.IsBound())
+	{
+		EnemyLogicComponent_PostTookDamage.Broadcast();
+	}
+	if (bStartedAttackingLoop)
+	{
+		StartAttackingLoop();
+	}
 }
 
 void UEnemyLogicComponent::Die()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Dead"))
+	bIsDead = true;
+	bIsAttacking = false;
+	bWasShot = false;
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	if (EnemyLogicComponent_Die.IsBound())
 	{
 		EnemyLogicComponent_Die.Broadcast();

@@ -40,11 +40,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	
+	UEnemyLogicComponent * EnemyLogicComponent;
 
 	UPROPERTY(EditAnywhere)
 	class AActor * ActorToMoveTo;

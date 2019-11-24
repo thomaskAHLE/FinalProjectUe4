@@ -41,10 +41,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
+	
 
-
-
-	// Called every frame
+// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	
@@ -55,9 +54,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void EndOnShot();
 
-
-	void StartAttacking();
-
 	UPROPERTY(EditAnywhere)
 		class USkeletalMeshComponent * SkeletalMesh;
 
@@ -67,39 +63,13 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UEnemyLogicComponent * EnemyLogicComponent;
 
-	UPROPERTY(EditAnywhere)
-	int MaxHealth = 10;
-	UPROPERTY(VisibleAnywhere, Category=State)
-	int CurrentHealth = 5;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
-	bool bWasShot = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
-	bool bIsDead = false;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
-	bool bIsAttacking = false;
-
-	UPROPERTY(EditAnywhere, Category=Timer)
-	float DelayBetweenAttacks = 1.f;
-
-	UPROPERTY(EditAnywhere, Category=Timer)
-		float DelayAfterShotTime = 1.f;
-
 	UPROPERTY(EditAnywhere, Category = Timer)
-	float DelayAfterDeathTime = 3.f;
-
-
-	FTimerHandle AttackDelayTimerHandle;
-
-	FTimerHandle ShotDelayTimerHandle;
+	float DelayAfterDeathTime = 2.6f;
 
 	FTimerHandle DeathDelayTimerHandle;
 
-	UFUNCTION()
-		void DestroyWrapper();
+	bool bStartedAttacking;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=State)
-	bool bStartedAttackingLoop = false;
+	UFUNCTION()
+	void DestroyWrapper();
 };

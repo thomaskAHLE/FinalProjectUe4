@@ -8,6 +8,14 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDieSignature);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTookDamageSignature, float /*Damage*/, Damage);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPostTookDamageSignature);
+
+
+
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PERSONALGAME_API UEnemyLogicComponent : public UActorComponent
 {
@@ -17,14 +25,25 @@ public:
 	// Sets default values for this component's properties
 	UEnemyLogicComponent();
 
-	UFUNCTION()
-		void AttackPlayer();
+	void StartAttackingLoop();
+
+	UPROPERTY(BlueprintAssignable)
+	mutable FDieSignature EnemyLogicComponent_Die;
+
+	UPROPERTY(BlueprintAssignable)
+	mutable FOnTookDamageSignature EnemyLogicComponent_TookDamage;
 	
 	UPROPERTY(BlueprintAssignable)
-	FDieSignature EnemyLogicComponent_Die;
+	mutable FPostTookDamageSignature EnemyLogicComponent_PostTookDamage;
 
 	UFUNCTION()
-		void TakeDamageFromPlayer(float Damage = 1.f);
+	void TakeDamageFromPlayer(float Damage = 1.f);
+
+	/*Getters*/
+	bool GetIsDead() const ;
+	bool GetWasShot() const ;
+	bool GetIsAttacking() const;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -47,17 +66,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = State)
 		bool bWasDamaged = false;
 	UPROPERTY(EditAnywhere, Category = Timer)
-		float DelayBetweenAttacks = 1.f;
+		float DelayBetweenAttacks = 2.6f;
 
 	UPROPERTY(EditAnywhere, Category = Timer)
-		float DelayAfterShotTime = 1.f;
+		float DelayAfterShotTime = 2.6f;
 
 	UPROPERTY(EditAnywhere, Category = Timer)
 	float DelayAfterDeathTime = 3.f;
 
 	UPROPERTY(EditAnywhere, Category = Damage)
 	float DamageCaused = 1.f;
-
+	
+	UFUNCTION()
+	void AttackPlayer();
 
 	FTimerHandle AttackDelayTimerHandle;
 
@@ -72,9 +93,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Target)
 	class AActor * ActorToAttack = nullptr;
 
-
 	UFUNCTION()
-	void EndTookDamageFromPlayer();
+	void PostTookDamageFromPlayer();
 
 	UFUNCTION()
 	void Die();
