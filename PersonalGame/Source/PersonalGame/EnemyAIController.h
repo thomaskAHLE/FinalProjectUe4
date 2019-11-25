@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveCompletedSuccessSignature);
+
 UCLASS()
 class PERSONALGAME_API AEnemyAIController : public AAIController
 {
@@ -16,17 +19,14 @@ class PERSONALGAME_API AEnemyAIController : public AAIController
 
 public:
 	AEnemyAIController();
-	void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	void TravelToPoint(class ATargetPoint * NextPointToTravelTo);
 
 	UFUNCTION(BlueprintCallable)
 	void TravelToActor(class AActor * ActorToTravelTo);
 
+	FMoveCompletedSuccessSignature EnemyAIController_MoveCompletedSuccess;
+
 protected:
-	UPROPERTY(EditAnywhere)
-	class ATargetPoint * PointToTravelTo;
 
 	UPROPERTY(EditAnywhere)
 	class AActor * ActorToTravelTo;

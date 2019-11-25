@@ -52,29 +52,24 @@ protected:
 	class AActor * ActorToMoveTo;
 
 	UPROPERTY(VisibleAnywhere)
-	class AEnemyAIController * MyController;
+	class AEnemyAIController * AIController;
 
-	UPROPERTY(EditAnywhere)
-	int MaxHealth = 10;
-	
-	UPROPERTY(VisibleAnywhere, Category = State)
-	int CurrentHealth = 5;
+	UPROPERTY(EditAnywhere, Category = Timer)
+	float DelayAfterDeathTime = 2.6f;
 
-	UPROPERTY(VisibleAnywhere, Category = State)
-	bool bWasShot = false;
+	UFUNCTION()
+	void EndOnShot();
 
-	UPROPERTY(VisibleAnywhere, Category = State)
-	bool bIsDead = false;
+	FTimerHandle DeathDelayTimerHandle;
 
-	UPROPERTY(VisibleAnywhere, Category = State)
-	bool bIsAttacking = false;
+	bool bStartedAttacking = false;
 
-	UPROPERTY(VisibleAnywhere, Category = State)
-	bool bWasDamaged = false;
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	bool bIsMoving = true;
+	bool bWasMoving = false;
 
-	
+	void StopMoving();
+	void StartMoving();
 
+	UFUNCTION()
+	void DestroyWrapper();
 };

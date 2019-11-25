@@ -3,7 +3,8 @@
 
 #include "EnemyAICharacter.h"
 #include "EnemyAIController.h"
-#include "EnemyAIController.h"
+#include "Engine/World.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
@@ -13,6 +14,9 @@ AEnemyAICharacter::AEnemyAICharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	AIControllerClass = AEnemyAIController::StaticClass();
 	EnemyLogicComponent = CreateDefaultSubobject <UEnemyLogicComponent>("Logic Component");
+	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AEnemyAICharacter::Die);
+	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AEnemyAICharacter::EndOnShot);
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_NavWalking);
 }
 
 
@@ -20,65 +24,111 @@ AEnemyAICharacter::AEnemyAICharacter()
 
 void AEnemyAICharacter::OnShot_Implementation(float Damage)
 {
-
+	if (bIsMoving)
+	{
+		StopMoving();
+	}
+	EnemyLogicComponent->TakeDamageFromPlayer(Damage);
 }
 
 bool AEnemyAICharacter::IsMoving_Implementation()
 {
-	return true;
+	return bIsMoving;
 }
 
 bool AEnemyAICharacter::IsAttacking_Implementation()
 {
-	return bIsAttacking;
+	return EnemyLogicComponent->GetIsAttacking();
 }
 
 bool AEnemyAICharacter::IsDead_Implementation()
 {
-	return bIsDead;
+	return EnemyLogicComponent->GetIsDead();
 }
 
 float AEnemyAICharacter::GetEnemyVelocity_Implementation()
 {
-	return 0.f;
+	FVector Velocity = GetVelocity();
+	return sqrt(Velocity.X * Velocity.X + Velocity.Y * Velocity.Y + Velocity.Z * Velocity.Z);
 }
 
 bool AEnemyAICharacter::WasDamaged_Implementation()
 {
-	return bWasDamaged;
+	return EnemyLogicComponent->GetWasShot();
 }
 
 void AEnemyAICharacter::Die_Implementation()
 {
-	
+	GetWorld()->GetTimerManager().SetTimer(DeathDelayTimerHandle, this, &AEnemyAICharacter::DestroyWrapper, DelayAfterDeathTime, false);
 }
 
 void AEnemyAICharacter::Attack_Implementation()
 {
-	
+	EnemyLogicComponent->StartAttackingLoop();
 }
 
 // Called when the game starts or when spawned
 void AEnemyAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	MyController = Cast<AEnemyAIController>(GetController());
-	if (MyController != nullptr)
+	AIController = Cast<AEnemyAIController>(GetController());
+	if (AIController != nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Has Controller"));
 		if (ActorToMoveTo != nullptr)
 		{
-			MyController->TravelToActor(ActorToMoveTo);
 		}
+		else
+		{
+			ActorToMoveTo = GetWorld()->GetFirstPlayerController()->GetPawn();
+		}
+	}
+	AIController->TravelToActor(ActorToMoveTo);
+	AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::Attack);
+	bIsMoving = true;
+	StartMoving();
+}
+
+void AEnemyAICharacter::EndOnShot()
+{
+	if (bWasMoving)
+	{
+		StartMoving();
 	}
 }
 
-// Called every frame
-void AEnemyAICharacter::Tick(float DeltaTime)
+void AEnemyAICharacter::StopMoving()
 {
-	Super::Tick(DeltaTime);
 
+	if (bIsMoving)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AI should stop moving"))
+		bWasMoving = true;
+		bIsMoving = false;
+		AIController->StopMovement();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AI didn't stop moving"));
+	}
 }
+
+void AEnemyAICharacter::StartMoving()
+{
+	if (!bIsMoving)
+	{
+		bIsMoving = true;
+		bWasMoving = false;
+		AIController->TravelToActor(ActorToMoveTo);
+	}
+}
+
+void AEnemyAICharacter::DestroyWrapper()
+{
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	Destroy();
+}
+
 
 
 
