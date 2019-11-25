@@ -60,7 +60,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 		class UCapsuleComponent * CollisionCapsule;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	class UEnemyLogicComponent * EnemyLogicComponent;
 
 	UPROPERTY(EditAnywhere, Category = Timer)

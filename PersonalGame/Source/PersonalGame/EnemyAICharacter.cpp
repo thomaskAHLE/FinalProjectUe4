@@ -75,16 +75,14 @@ void AEnemyAICharacter::BeginPlay()
 	if (AIController != nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Has Controller"));
-		if (ActorToMoveTo != nullptr)
-		{
-		}
-		else
+		if (ActorToMoveTo == nullptr)
 		{
 			ActorToMoveTo = GetWorld()->GetFirstPlayerController()->GetPawn();
 		}
+		AIController->TravelToActor(ActorToMoveTo);
+		AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::Attack);
+
 	}
-	AIController->TravelToActor(ActorToMoveTo);
-	AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::Attack);
 	bIsMoving = true;
 	StartMoving();
 }
