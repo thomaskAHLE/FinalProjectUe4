@@ -31,6 +31,18 @@ void AOnRailSplineActor::OnConstruction(const FTransform& Transform)
 			SpeedMultiplierToSplinePoint[i] = DefaultSpeedMultiplier;
 		}
 	}
+	if (EDITOR_ONLY_bUpdateDefaultSpeedMultiplier)
+	{
+		for (auto & speed : SpeedMultiplierToSplinePoint)
+		{
+			if (FMath::IsNearlyEqual(speed, LastDefaultSpeedMultiplier))
+			{
+				speed = DefaultSpeedMultiplier;
+			}
+		}
+		LastDefaultSpeedMultiplier = DefaultSpeedMultiplier;
+	}
+	EDITOR_ONLY_bUpdateDefaultSpeedMultiplier = false;
 	#endif
 }
 
@@ -77,6 +89,11 @@ float AOnRailSplineActor::GetCurrentSpeedMultiplier() const
 	return CurrentSpeedMultiplier;
 }
 
+void AOnRailSplineActor::SetTravelerSpeedMultiplier(float SpeedMultiplier /*= 1.f*/)
+{
+	TravelingActorSpeedMultiplier = SpeedMultiplier;
+}
+
 #if WITH_EDITOR
 FRotator AOnRailSplineActor::GetRotAtIdx(int32& index) const
 {
@@ -117,14 +134,15 @@ void AOnRailSplineActor::BeginPlay()
 
 void AOnRailSplineActor::UpdateCurrentDistance(float time)
 {
-	CurrentSpeedMultiplier = GetSpeedMultiplier(NextSplinePointIdx, CurrentDistance);
+	CurrentSpeedMultiplier = GetSpeedMultiplier(NextSplinePointIdx, CurrentDistance) * TravelingActorSpeedMultiplier;
 	CurrentDistance += time * CurrentSpeedMultiplier;
 }
 
 
 float AOnRailSplineActor::GetSpeedMultiplier_Implementation(int32 TravelingToIdx, float DistanceAlongSpline)
 {
-	return SpeedMultiplierToSplinePoint[TravelingToIdx];
+
+	return TravelingToIdx < SpeedMultiplierToSplinePoint.Num() ? SpeedMultiplierToSplinePoint[TravelingToIdx] : DefaultSpeedMultiplier;
 }
 
 // Called every frame

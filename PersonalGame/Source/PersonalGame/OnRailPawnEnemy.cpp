@@ -5,9 +5,10 @@
 #include "OnRailPawnEnemy.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "OnRailSplineActor.h"
 #include "GameFramework/PlayerController.h"
 #include "OnRailPawnPlayer.h"
+#include "OnRailSplineActor.h"
+#include "EnemyLogicComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -19,119 +20,87 @@ AOnRailPawnEnemy::AOnRailPawnEnemy()
 
 	CollisionCapsule = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
 	CollisionCapsule->SetupAttachment(SkeletalMesh);
-
 	CollisionCapsule->SetGenerateOverlapEvents(true);
+	EnemyLogicComponent = CreateDefaultSubobject<UEnemyLogicComponent>("Logic Component");
+	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AOnRailPawnEnemy::Die);
+	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AOnRailPawnEnemy::EndOnShot);
 }
 
-void AOnRailPawnEnemy::OnShot_Implementation()
+void AOnRailPawnEnemy::OnShot_Implementation(float Damage)
 {
-	if (!bIsDead)
+	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
 	{
-		UE_LOG(LogTemp, Error, TEXT("On Shot"))
-			bWasShot = true;
-		--CurrentHealth;
-		if (RailToFollow != nullptr && RailToFollow->IsMoving())
-		{
-			RailToFollow->StopMoving();
-		}
-		if (bStartedAttackingLoop)
-		{
-			bIsAttacking = false;
-			GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
-		}
-		//Play animation or something
-		if (CurrentHealth <= 0)
-		{
-			Die();
-		}
-		else
-		{
-			
-			GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &AOnRailPawnEnemy::EndOnShot, DelayAfterShotTime, false);
-		}
+		RailToFollow->StopMoving();
+	}
+	if (EnemyLogicComponent != nullptr)
+	{
+		EnemyLogicComponent->TakeDamageFromPlayer(Damage);
 	}
 }
 
 
+float AOnRailPawnEnemy::GetEnemyVelocity_Implementation()
+{
+	return GetCurrentVelocity();
+}
+
+bool AOnRailPawnEnemy::IsDead_Implementation()
+{
+	return EnemyLogicComponent->GetIsDead();
+}
+
+bool AOnRailPawnEnemy::WasDamaged_Implementation()
+{
+	
+	return EnemyLogicComponent->GetWasShot();
+}
+
 void AOnRailPawnEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (!bStartedAttackingLoop && RailToFollow != nullptr && RailToFollow->HasReachedEndOfRail())
+	if (!bStartedAttacking && RailToFollow != nullptr && RailToFollow->HasReachedEndOfRail())
 	{
-		bStartedAttackingLoop = true;
-		UE_LOG(LogTemp, Error, TEXT("Should Start Attacking"))
-		StartAttacking();
+		bStartedAttacking = true;
+		EnemyLogicComponent->StartAttackingLoop();
 	}
 }
 
 void AOnRailPawnEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	CurrentHealth = MaxHealth;
-	bStartedAttackingLoop = false;
 	
 }
 
-void AOnRailPawnEnemy::Attack()
+void AOnRailPawnEnemy::Attack_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Attack"));
-	
-	//I Hate this implementation, but I can't think of a better way right now.
-	UWorld const * World = GetWorld();
-	if (World != nullptr)
+	if (EnemyLogicComponent != nullptr)
 	{
-		APlayerController * PC = World->GetFirstPlayerController();
-		if (PC != nullptr)
-		{
-			AOnRailPawnPlayer * Player = Cast<AOnRailPawnPlayer>(PC->GetPawn());
-			if (Player)
-			{
-				Player->Take_Damage();
-			}
-		}
+		EnemyLogicComponent->StartAttackingLoop();
 	}
-
 }
 
 void AOnRailPawnEnemy::EndOnShot()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EndOnShot"))
-
-
-	if (!bIsDead)
+	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
 	{
-		bWasShot = false;
-		if (bStartedAttackingLoop)
-		{
-			bIsAttacking = true;
-			StartAttacking();
-		}
-		else
-		{
-			if (RailToFollow != nullptr)
-			{
-				UE_LOG(LogTemp, Error, TEXT("Start Moving again"))
-					RailToFollow->StartMoving();
-			}
-		}
+		RailToFollow->StartMoving();
 	}
 }
 
-void AOnRailPawnEnemy::StartAttacking()
+void AOnRailPawnEnemy::Die_Implementation()
 {
-	bIsAttacking = true;
-	UE_LOG(LogTemp, Error, TEXT("Start Attacking Timer"))
-	GetWorld()->GetTimerManager().SetTimer(AttackDelayTimerHandle, this, &AOnRailPawnEnemy::Attack, DelayBetweenAttacks, true, 1.f);
-}
-
-void AOnRailPawnEnemy::Die()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Dying"))
-	bIsDead = true;
-	bIsAttacking = false;
-	bWasShot = false;
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	GetWorld()->GetTimerManager().SetTimer(DeathDelayTimerHandle, this, &AOnRailPawnEnemy::DestroyWrapper, DelayAfterDeathTime, false);
+}
+
+bool AOnRailPawnEnemy::IsAttacking_Implementation()
+{
+	return EnemyLogicComponent->GetIsAttacking();
+}
+
+bool AOnRailPawnEnemy::IsMoving_Implementation()
+{
+	return 0.f < GetEnemyVelocity();
 }
 
 void AOnRailPawnEnemy::DestroyWrapper()

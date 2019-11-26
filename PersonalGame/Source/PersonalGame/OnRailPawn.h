@@ -26,6 +26,10 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere)
 	bool bUpdateRotationWithSpline = true;
+	
+	//Set to change speed of instanced pawn
+	UPROPERTY(EditAnywhere)
+	float PawnSpeedMultiplier = 1.f;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -38,11 +42,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StopPawnMoving();
 
+	UFUNCTION(BlueprintCallable)
+	void SetRailToFollow(class AOnRailSplineActor * Rail);
 
 private:
 	// Allows changing pawn position on spline in the editor to get a better view of how it should look
 // only use in on construction
 
+	float LastDistance = 0.f;
+	
+	int32 LastIndex = 0;
 
 	//Point in spline at index
 	UPROPERTY(EditAnywhere, Category = EditorOnly)

@@ -22,9 +22,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//Called when player is attacked 
-	void Take_Damage();
-
 	UFUNCTION(BlueprintCallable)
 	int GetHealth() const;
 
@@ -33,6 +30,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int GetAmmo() const;
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 

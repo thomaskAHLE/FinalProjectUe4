@@ -43,24 +43,6 @@ void AOnRailPawnPlayer::Tick(float DeltaTime)
 	AimGun();
 }
 
-void AOnRailPawnPlayer::Take_Damage()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Taking damage"))
-	--CurrentHealth;
-	if (CurrentHealth <= 0)
-	{
-		Die();
-	}
-	else {
-		
-		if (PlayerHitSound != NULL)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, PlayerHitSound, GetActorLocation());
-		}
-
-	}
-
-}
 
 int AOnRailPawnPlayer::GetHealth() const
 {
@@ -75,6 +57,14 @@ bool AOnRailPawnPlayer::GetIsReloading() const
 int AOnRailPawnPlayer::GetAmmo() const
 {
 	return CurrentAmmo;
+}
+
+float AOnRailPawnPlayer::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float returnValue = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	CurrentHealth -= Damage;
+	if (CurrentHealth <= 0) Die();
+	return returnValue;
 }
 
 void AOnRailPawnPlayer::BeginPlay()

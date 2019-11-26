@@ -37,6 +37,9 @@ protected:
 	UPROPERTY(EditAnywhere)
     float LifeSpan = 3.f;	
 
+	UPROPERTY(EditAnywhere)
+		float BulletDamage = 1.f;
+
 	FTimerHandle DelayBeforeDestroyTimerHandle;
 
 	//The Time between BulletActor overlapping another object in the scene and when it should destroy itself

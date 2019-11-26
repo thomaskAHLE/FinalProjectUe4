@@ -3,23 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "OnRailPawn.h"
-#include "ShootableInterface.h"
+#include "GameFramework/Character.h"
 #include "EnemyInterface.h"
-#include "OnRailPawnEnemy.generated.h"
+#include "ShootableInterface.h"
+#include "EnemyAICharacter.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class PERSONALGAME_API AOnRailPawnEnemy : public AOnRailPawn, public IShootableInterface, public IEnemyInterface
+class PERSONALGAME_API AEnemyAICharacter : public ACharacter, public IShootableInterface,  public IEnemyInterface
 {
 	GENERATED_BODY()
+
 public:
-	AOnRailPawnEnemy();
+	// Sets default values for this character's properties
+	AEnemyAICharacter();
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
 	void OnShot(float Damage);
-	virtual void OnShot_Implementation(float Damage) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 		void Attack();
@@ -41,34 +40,36 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
-	
 
-// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
-	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	void EndOnShot();
+	UPROPERTY(VisibleAnywhere)
+	UEnemyLogicComponent * EnemyLogicComponent;
 
 	UPROPERTY(EditAnywhere)
-		class USkeletalMeshComponent * SkeletalMesh;
-
-	UPROPERTY(EditAnywhere)
-		class UCapsuleComponent * CollisionCapsule;
+	class AActor * ActorToMoveTo;
 
 	UPROPERTY(VisibleAnywhere)
-	class UEnemyLogicComponent * EnemyLogicComponent;
+	class AEnemyAIController * AIController;
 
 	UPROPERTY(EditAnywhere, Category = Timer)
 	float DelayAfterDeathTime = 2.6f;
 
+	UFUNCTION()
+	void EndOnShot();
+
 	FTimerHandle DeathDelayTimerHandle;
 
-	bool bStartedAttacking;
+	bool bStartedAttacking = false;
+
+	bool bIsMoving = true;
+	bool bWasMoving = false;
+
+	void StopMoving();
+	void StartMoving();
 
 	UFUNCTION()
 	void DestroyWrapper();
