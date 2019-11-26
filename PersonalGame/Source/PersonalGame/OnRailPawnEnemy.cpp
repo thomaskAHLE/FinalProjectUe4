@@ -46,10 +46,7 @@ void AOnRailPawnEnemy::OnShot_Implementation()
 		}
 		else
 		{
-			//if (ZombieHitSound != NULL)
-			//{
-			//	UGameplayStatics::PlaySoundAtLocation(this, ZombieHitSound, GetActorLocation());
-		//	}
+			
 			GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &AOnRailPawnEnemy::EndOnShot, DelayAfterShotTime, false);
 		}
 	}

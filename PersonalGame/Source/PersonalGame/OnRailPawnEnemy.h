@@ -80,12 +80,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=State)
 	bool bStartedAttackingLoop = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	class USoundBase* ZombieHitSound;
+	
 
-	//fd;slakjsal;kjsadf
-	UPROPERTY()
-	int32 foo;
+	
 
 
 };
