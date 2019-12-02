@@ -51,8 +51,13 @@ void ABulletActor::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
 			
 			if (OtherActor->GetClass()->ImplementsInterface(UShootableInterface::StaticClass()))
 			{
+				if (HitShootableSignature.IsBound())
+				{
+					HitShootableSignature.Broadcast();
+				}
 				IShootableInterface::Execute_OnShot(OtherActor, BulletDamage);
 				GetWorld()->GetTimerManager().SetTimer(DelayBeforeDestroyTimerHandle, this, &ABulletActor::DestroyWrapper, DelayBeforeDestroy, false);
+				
 			}
 			else
 			{

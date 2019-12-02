@@ -8,6 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "PlayerScoreComponent.h"
 #include "BulletActor.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
@@ -15,7 +16,6 @@
 #include "Engine/GameViewportClient.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "DrawDebugHelpers.h"
 
 AOnRailPawnPlayer::AOnRailPawnPlayer()
 {
@@ -27,6 +27,8 @@ AOnRailPawnPlayer::AOnRailPawnPlayer()
 
 	MuzzleStart = CreateDefaultSubobject<USceneComponent>("MuzzleStart");
 	MuzzleStart->SetupAttachment(GunMesh);
+
+	PlayerScoreComponent = CreateDefaultSubobject<UPlayerScoreComponent>("PlayerScoreComponent");
 
 }
 
@@ -68,6 +70,11 @@ float AOnRailPawnPlayer::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	return returnValue;
 }
 
+class UPlayerScoreComponent * AOnRailPawnPlayer::GetPlayerScoreComponent() const
+{
+	return PlayerScoreComponent;
+}
+
 void AOnRailPawnPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -102,12 +109,13 @@ void AOnRailPawnPlayer::Shoot()
 		bIsShooting = true;
 		--CurrentAmmo;
 		//Not sure if correct collision channel
+		PlayerScoreComponent->IncrementTotalShots();
 		FActorSpawnParameters BulletSpawnParams;
 		BulletSpawnParams.Owner = this;
 
 		BulletSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-		GetWorld()->SpawnActor<ABulletActor>(BulletType, MuzzleStart->GetComponentLocation() , GunMesh->GetComponentRotation(), BulletSpawnParams);
-		
+		ABulletActor * SpawnedBullet = GetWorld()->SpawnActor<ABulletActor>(BulletType, MuzzleStart->GetComponentLocation() , GunMesh->GetComponentRotation(), BulletSpawnParams);
+		SpawnedBullet->HitShootableSignature.AddDynamic(PlayerScoreComponent, &UPlayerScoreComponent::IncrementNumHit);
 		//called after DelayeBetweenShots seconds 
 		GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, this, &AOnRailPawnPlayer::EndShoot, DelayBetweenShots, false);
 
@@ -121,6 +129,11 @@ void AOnRailPawnPlayer::Shoot()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Can't shoot yet"));
 	}
+}
+
+void AOnRailPawnPlayer::GameWon()
+{
+	PlayerScoreComponent->StopTime();
 }
 
 void AOnRailPawnPlayer::EndReload()
@@ -141,7 +154,7 @@ void AOnRailPawnPlayer::EndShoot()
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Shoot finished"));
 }
-/*Fix Me!*/
+
 void AOnRailPawnPlayer::AimGun()
 {
 	FVector MouseWorldDirection;
@@ -179,7 +192,6 @@ void AOnRailPawnPlayer::AimGun()
 					{
 						LookAtPos = HitResult.Location;
 					}
-					//DrawDebugLine(World, MuzzleStart->GetComponentLocation(), LookAtPos, FColor::Red);
 					FRotator GunRotation = UKismetMathLibrary::FindLookAtRotation(GunMesh->GetComponentLocation(), LookAtPos);
 					GunMesh->SetWorldRotation(GunRotation);
 					CurrentAimPoint = (100 * WorldDirection) + MuzzleStart->GetComponentLocation();
@@ -189,10 +201,11 @@ void AOnRailPawnPlayer::AimGun()
 	}
 }
 
-void AOnRailPawnPlayer::Die()
+void AOnRailPawnPlayer::Die_Implementation()
 {
-	//Handle death and reload level 
-	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
-
-	UE_LOG(LogTemp, Error, TEXT("%s died"), *GetName())
+	if (OnDie.IsBound())
+	{
+		OnDie.Broadcast();
+	}
 }
+

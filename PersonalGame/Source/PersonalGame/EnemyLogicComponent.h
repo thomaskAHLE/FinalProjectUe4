@@ -39,6 +39,9 @@ public:
 	UFUNCTION()
 	void TakeDamageFromPlayer(float Damage = 1.f);
 
+	UFUNCTION()
+	void StopAttackingLoop();
+
 	/*Getters*/
 	bool GetIsDead() const ;
 	bool GetWasShot() const ;

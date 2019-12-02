@@ -18,11 +18,12 @@ void AEnemyAIController::TravelToActor( AActor * ActorToTravelTo)
 void AEnemyAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
-	UE_LOG(LogTemp, Warning, TEXT("Move completed"));
+
 	if (Result == EPathFollowingResult::Success)
 	{
 		if (EnemyAIController_MoveCompletedSuccess.IsBound())
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Move completed for %s "),*GetName());
 			EnemyAIController_MoveCompletedSuccess.Broadcast();
 		}
 	}

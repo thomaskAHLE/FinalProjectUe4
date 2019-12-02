@@ -54,24 +54,19 @@ bool AOnRailPawnEnemy::WasDamaged_Implementation()
 	return EnemyLogicComponent->GetWasShot();
 }
 
-void AOnRailPawnEnemy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	if (!bStartedAttacking && RailToFollow != nullptr && RailToFollow->HasReachedEndOfRail())
-	{
-		bStartedAttacking = true;
-		EnemyLogicComponent->StartAttackingLoop();
-	}
-}
-
 void AOnRailPawnEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	if (RailToFollow != nullptr)
+	{
+		RailToFollow->EndOfSplineSignature.AddDynamic(this, &AOnRailPawnEnemy::Attack);
+	}
 	
 }
 
 void AOnRailPawnEnemy::Attack_Implementation()
 {
+	bStartedAttacking = true;
 	if (EnemyLogicComponent != nullptr)
 	{
 		EnemyLogicComponent->StartAttackingLoop();

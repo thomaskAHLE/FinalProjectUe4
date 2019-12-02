@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "OnRailSplineActor.generated.h"
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReachedEndOfSplineSignature);
 UCLASS()
 class PERSONALGAME_API AOnRailSplineActor : public AActor
 {
@@ -16,6 +16,7 @@ public:
 	// Sets default values for this actor's properties
 	AOnRailSplineActor();
 	
+	FReachedEndOfSplineSignature EndOfSplineSignature;
 	// for updating when changed in level
 	virtual void OnConstruction(const FTransform& Transform) override;
 
