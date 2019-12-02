@@ -91,6 +91,12 @@ void UEnemyLogicComponent::TakeDamageFromPlayer(float Damage /*=1.f*/)
 	}
 }
 
+void UEnemyLogicComponent::StopAttackingLoop()
+{
+	bStartedAttackingLoop = false;
+	GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
+}
+
 bool UEnemyLogicComponent::GetIsDead() const 
 {
 	return bIsDead;

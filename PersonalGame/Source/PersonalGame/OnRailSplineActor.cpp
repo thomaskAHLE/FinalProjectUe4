@@ -167,6 +167,10 @@ void AOnRailSplineActor::Tick(float DeltaTime)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Reached end of spline %s, stopped moving"), *GetName())
 				bHasReachedendOfRail = true;
+				if (EndOfSplineSignature.IsBound())
+				{
+					EndOfSplineSignature.Broadcast();
+				}
 				bIsMoving = false;
 			}
 			

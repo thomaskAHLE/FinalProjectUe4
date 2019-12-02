@@ -8,6 +8,8 @@
 #include "GameFramework/Actor.h"
 #include "BulletActor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHitShootableSignature);
+
 UCLASS()
 class PERSONALGAME_API ABulletActor : public AActor
 {
@@ -16,7 +18,7 @@ class PERSONALGAME_API ABulletActor : public AActor
 public:
 	// Sets default values for this actor's properties
 	ABulletActor();
-
+	FHitShootableSignature HitShootableSignature;
 protected:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* BulletCollision;

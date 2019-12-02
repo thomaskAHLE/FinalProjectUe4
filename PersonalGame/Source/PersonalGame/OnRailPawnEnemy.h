@@ -41,10 +41,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
-	
-
-// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	
 protected:
