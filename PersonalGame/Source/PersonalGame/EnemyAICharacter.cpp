@@ -67,6 +67,11 @@ void AEnemyAICharacter::Attack_Implementation()
 	EnemyLogicComponent->StartAttackingLoop();
 }
 
+UEnemyLogicComponent * AEnemyAICharacter::GetLogicComponent()
+{
+	return EnemyLogicComponent;
+}
+
 // Called when the game starts or when spawned
 void AEnemyAICharacter::BeginPlay()
 {
@@ -103,7 +108,10 @@ void AEnemyAICharacter::StopMoving()
 		UE_LOG(LogTemp, Warning, TEXT("AI should stop moving"))
 		bWasMoving = true;
 		bIsMoving = false;
-		AIController->StopMovement();
+		if (AIController != nullptr)
+		{
+			AIController->StopMovement();
+		}
 	}
 	else
 	{

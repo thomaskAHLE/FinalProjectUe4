@@ -8,6 +8,8 @@
 #include "ShootableInterface.h"
 #include "EnemyAICharacter.generated.h"
 
+
+
 UCLASS()
 class PERSONALGAME_API AEnemyAICharacter : public ACharacter, public IShootableInterface,  public IEnemyInterface
 {
@@ -41,13 +43,15 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
 
+	UFUNCTION(BlueprintCallable)
+		class UEnemyLogicComponent* GetLogicComponent();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
-	UEnemyLogicComponent * EnemyLogicComponent;
+		class UEnemyLogicComponent * EnemyLogicComponent;
 
 	UPROPERTY(EditAnywhere)
 	class AActor * ActorToMoveTo;
@@ -68,7 +72,10 @@ protected:
 	bool bIsMoving = true;
 	bool bWasMoving = false;
 
+	UFUNCTION(BlueprintCallable)
 	void StopMoving();
+
+	UFUNCTION(BlueprintCallable)
 	void StartMoving();
 
 	UFUNCTION()
