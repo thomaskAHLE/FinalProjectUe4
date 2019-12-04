@@ -127,13 +127,16 @@ void UEnemyLogicComponent::PostTookDamageFromPlayer()
 
 void UEnemyLogicComponent::Die()
 {
-	bIsDead = true;
-	bIsAttacking = false;
-	bWasShot = false;
-	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	if (EnemyLogicComponent_Die.IsBound())
+	if (!bIsDead)
 	{
-		EnemyLogicComponent_Die.Broadcast();
+		bIsDead = true;
+		bIsAttacking = false;
+		bWasShot = false;
+		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+		if (EnemyLogicComponent_Die.IsBound())
+		{
+			EnemyLogicComponent_Die.Broadcast();
+		}
 	}
 }
 

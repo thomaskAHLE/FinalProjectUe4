@@ -64,6 +64,8 @@ void AEnemyAICharacter::Die_Implementation()
 
 void AEnemyAICharacter::Attack_Implementation()
 {
+	bIsMoving = false;
+	bWasMoving = false;
 	EnemyLogicComponent->StartAttackingLoop();
 }
 
@@ -76,20 +78,10 @@ UEnemyLogicComponent * AEnemyAICharacter::GetLogicComponent()
 void AEnemyAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	bIsMoving = false;
 	AIController = Cast<AEnemyAIController>(GetController());
-	if (AIController != nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Has Controller"));
-		if (ActorToMoveTo == nullptr)
-		{
-			ActorToMoveTo = GetWorld()->GetFirstPlayerController()->GetPawn();
-		}
-		AIController->TravelToActor(ActorToMoveTo);
-		AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::Attack);
-
-	}
-	bIsMoving = true;
-	StartMoving();
+	AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::Attack);
+	
 }
 
 void AEnemyAICharacter::EndOnShot()
@@ -102,7 +94,6 @@ void AEnemyAICharacter::EndOnShot()
 
 void AEnemyAICharacter::StopMoving()
 {
-
 	if (bIsMoving)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AI should stop moving"))
@@ -121,11 +112,24 @@ void AEnemyAICharacter::StopMoving()
 
 void AEnemyAICharacter::StartMoving()
 {
-	if (!bIsMoving)
+	if (!bIsMoving && bWasMoving)
 	{
 		bIsMoving = true;
 		bWasMoving = false;
-		AIController->TravelToActor(ActorToMoveTo);
+		
+		if (AIController != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Has Controller"));
+			if (ActorToMoveTo == nullptr)
+			{
+				ActorToMoveTo = GetWorld()->GetFirstPlayerController()->GetPawn();
+			}
+			AIController->TravelToActor(ActorToMoveTo);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s can't stop moving because there isn't a controller"), *GetName())
+		}
 	}
 }
 
