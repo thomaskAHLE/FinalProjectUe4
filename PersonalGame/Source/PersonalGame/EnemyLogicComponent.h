@@ -72,10 +72,7 @@ protected:
 		float DelayBetweenAttacks = 2.6f;
 
 	UPROPERTY(EditAnywhere, Category = Timer)
-		float DelayAfterShotTime = 2.6f;
-
-	UPROPERTY(EditAnywhere, Category = Timer)
-	float DelayAfterDeathTime = 3.f;
+	float DelayAfterShotTime = 2.6f;
 
 	UPROPERTY(EditAnywhere, Category = Damage)
 	float DamageCaused = 1.f;
@@ -86,8 +83,6 @@ protected:
 	FTimerHandle AttackDelayTimerHandle;
 
 	FTimerHandle ShotDelayTimerHandle;
-
-	FTimerHandle DeathDelayTimerHandle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
 	bool bStartedAttackingLoop = false;

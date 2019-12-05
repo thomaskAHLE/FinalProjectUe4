@@ -5,11 +5,6 @@
 #include "Engine/TargetPoint.h"
 
 
-AEnemyAIController::AEnemyAIController()
-{
-
-}
-
 void AEnemyAIController::TravelToActor( AActor * ActorToTravelTo)
 {
 	UE_LOG(LogTemp, Warning, TEXT("trying to start travel"))

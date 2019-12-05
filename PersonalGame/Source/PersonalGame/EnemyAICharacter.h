@@ -20,7 +20,7 @@ public:
 	AEnemyAICharacter();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
-	void OnShot(float Damage);
+	void OnShot(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 		void Attack();
@@ -52,6 +52,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 		class UEnemyLogicComponent * EnemyLogicComponent;
+
+	UPROPERTY(EditAnywhere)
+	class USphereComponent * HeadCollisionSphere;
 
 	UPROPERTY(EditAnywhere)
 	class AActor * ActorToMoveTo;

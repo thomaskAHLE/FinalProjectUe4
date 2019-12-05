@@ -26,7 +26,10 @@ AOnRailPawnEnemy::AOnRailPawnEnemy()
 	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AOnRailPawnEnemy::EndOnShot);
 }
 
-void AOnRailPawnEnemy::OnShot_Implementation(float Damage)
+
+
+
+void AOnRailPawnEnemy::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags)
 {
 	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
 	{
@@ -37,7 +40,6 @@ void AOnRailPawnEnemy::OnShot_Implementation(float Damage)
 		EnemyLogicComponent->TakeDamageFromPlayer(Damage);
 	}
 }
-
 
 float AOnRailPawnEnemy::GetEnemyVelocity_Implementation()
 {

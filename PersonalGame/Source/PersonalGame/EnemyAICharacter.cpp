@@ -6,6 +6,8 @@
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 AEnemyAICharacter::AEnemyAICharacter()
@@ -14,6 +16,10 @@ AEnemyAICharacter::AEnemyAICharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	AIControllerClass = AEnemyAIController::StaticClass();
 	EnemyLogicComponent = CreateDefaultSubobject <UEnemyLogicComponent>("Logic Component");
+	HeadCollisionSphere = CreateDefaultSubobject<USphereComponent>("Head Sphere Collision");
+	HeadCollisionSphere->SetupAttachment(this->GetMesh());
+	this->GetCapsuleComponent()->ComponentTags.Add("Body");
+	HeadCollisionSphere->ComponentTags.Add("Head");
 	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AEnemyAICharacter::Die);
 	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AEnemyAICharacter::EndOnShot);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_NavWalking);
@@ -22,13 +28,27 @@ AEnemyAICharacter::AEnemyAICharacter()
 
 
 
-void AEnemyAICharacter::OnShot_Implementation(float Damage)
+
+
+void AEnemyAICharacter::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags)
 {
+	
 	if (bIsMoving)
 	{
 		StopMoving();
 	}
-	EnemyLogicComponent->TakeDamageFromPlayer(Damage);
+	if (ComponentTags.Num() > 0)
+	{
+		if (ComponentTags.Find(FName("Head")) != INDEX_NONE)
+		{
+			EnemyLogicComponent->TakeDamageFromPlayer(Damage * 10);
+		}
+		else
+		{
+			EnemyLogicComponent->TakeDamageFromPlayer(Damage);
+		}
+
+	}
 }
 
 bool AEnemyAICharacter::IsMoving_Implementation()

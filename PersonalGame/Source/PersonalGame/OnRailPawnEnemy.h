@@ -18,8 +18,7 @@ class PERSONALGAME_API AOnRailPawnEnemy : public AOnRailPawn, public IShootableI
 public:
 	AOnRailPawnEnemy();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
-	void OnShot(float Damage);
-	virtual void OnShot_Implementation(float Damage) override;
+	void OnShot(float Damage, FVector HitLocation,const TArray<FName>& ComponentTags);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 		void Attack();
