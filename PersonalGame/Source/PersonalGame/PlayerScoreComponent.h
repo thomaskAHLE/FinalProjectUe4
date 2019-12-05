@@ -15,8 +15,6 @@ class PERSONALGAME_API UPlayerScoreComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
-	UPlayerScoreComponent();
 	UFUNCTION(BlueprintCallable)
 	int32 GetTotalShots() const;
 	UFUNCTION(BlueprintCallable)
@@ -32,9 +30,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 		float GetTimePlayed() const;
 	
+	UFUNCTION(BlueprintCallable)
+	float GetScoreDamageMultiplier() const;
+
 	void ResetScoreComponent();
 	
 	void StopTime();
+
+	void ResetHitStreak();
 	
 
 
@@ -44,12 +47,24 @@ protected:
 	int32 TotalShots;
 	int32 NumberHit;
 	int32 NumberKilled;
+	//Streak of hitting a shootable without being hit by 
+	int32 HitStreak;
 	float StartTime;
 	float EndTime;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(EditAnywhere)
+	int32 StreakRequiredToFirstDamageMultiplier = 2;
 
+	UPROPERTY(EditAnywhere)
+	int32 StreakRequiredToSecondDamageMultiplier = 3;
+
+	UPROPERTY(EditAnywhere)
+	float BaseDamageMultiplierValue = 2.f;
+
+	UPROPERTY(EditAnywhere)
+	float FirstDamageMultiplierValue = 2.f;
+
+	UPROPERTY(EditAnywhere)
+	float SecondDamageMultiplierValue = 3.f;
 		
 };

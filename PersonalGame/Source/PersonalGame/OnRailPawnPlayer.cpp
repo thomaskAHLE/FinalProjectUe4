@@ -65,7 +65,8 @@ float AOnRailPawnPlayer::TakeDamage(float Damage, struct FDamageEvent const& Dam
 {
 	float returnValue = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	CurrentHealth -= Damage;
-	if (CurrentHealth <= 0) Die();
+	PlayerScoreComponent->ResetHitStreak();
+	if (CurrentHealth <= 0) Die_Implementation();
 	return returnValue;
 }
 
@@ -114,7 +115,8 @@ void AOnRailPawnPlayer::Shoot()
 
 		BulletSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 		ABulletActor * SpawnedBullet = GetWorld()->SpawnActor<ABulletActor>(BulletType, MuzzleStart->GetComponentLocation() , GunMesh->GetComponentRotation(), BulletSpawnParams);
-		SpawnedBullet->HitShootableSignature.AddDynamic(PlayerScoreComponent, &UPlayerScoreComponent::IncrementNumHit);
+		SpawnedBullet->OnHitShootable.AddDynamic(PlayerScoreComponent, &UPlayerScoreComponent::IncrementNumHit);
+		SpawnedBullet->SetBulletMultiplier(PlayerScoreComponent->GetScoreDamageMultiplier());
 		//called after DelayeBetweenShots seconds 
 		GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, this, &AOnRailPawnPlayer::EndShoot, DelayBetweenShots, false);
 

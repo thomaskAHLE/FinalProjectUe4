@@ -18,7 +18,8 @@ class PERSONALGAME_API ABulletActor : public AActor
 public:
 	// Sets default values for this actor's properties
 	ABulletActor();
-	FHitShootableSignature HitShootableSignature;
+	FHitShootableSignature OnHitShootable;
+	void SetBulletMultiplier(const float BulletDamageMultiplier);
 protected:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* BulletCollision;

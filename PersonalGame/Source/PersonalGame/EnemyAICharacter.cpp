@@ -27,6 +27,7 @@ AEnemyAICharacter::AEnemyAICharacter()
 
 void AEnemyAICharacter::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags)
 {
+	UE_LOG(LogTemp, Error, TEXT("Damage taken %f"), Damage);
 	if (IsMoving_Implementation())
 	{
 		StopMoving();

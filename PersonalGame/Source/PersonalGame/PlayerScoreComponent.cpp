@@ -4,17 +4,6 @@
 #include "PlayerScoreComponent.h"
 #include "Engine/World.h"
 
-// Sets default values for this component's properties
-UPlayerScoreComponent::UPlayerScoreComponent()
-{
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
-}
-
-
 int32 UPlayerScoreComponent::GetTotalShots() const
 {
 	return TotalShots;
@@ -46,10 +35,12 @@ void UPlayerScoreComponent::IncrementNumHit()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Incrementing Number Hit"))
 	++NumberHit;
+	++HitStreak;
 }
 
 void UPlayerScoreComponent::ResetScoreComponent()
 {
+	HitStreak = 0;
 	TotalShots = 0;
 	NumberHit = 0;
 	NumberKilled = 0;
@@ -62,9 +53,34 @@ void UPlayerScoreComponent::StopTime()
 	EndTime = GetWorld()->GetTimeSeconds();
 }
 
+void UPlayerScoreComponent::ResetHitStreak()
+{
+	HitStreak = 0;
+}
+
 float UPlayerScoreComponent::GetTimePlayed() const
 {
 	return StartTime < EndTime ? EndTime - StartTime : GetWorld()->GetTimeSeconds() - StartTime;
+}
+
+float UPlayerScoreComponent::GetScoreDamageMultiplier() const
+{
+
+	if (HitStreak < StreakRequiredToFirstDamageMultiplier)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Using base damage multiplier"));
+		return BaseDamageMultiplierValue;
+	}
+	else if (HitStreak < StreakRequiredToSecondDamageMultiplier)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Using first damage multiplier"));
+		return FirstDamageMultiplierValue;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Using second damage multiplier"));
+		return SecondDamageMultiplierValue;
+	}
 }
 
 // Called when the game starts
@@ -74,12 +90,4 @@ void UPlayerScoreComponent::BeginPlay()
 	ResetScoreComponent();
 }
 
-
-// Called every frame
-void UPlayerScoreComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
 
