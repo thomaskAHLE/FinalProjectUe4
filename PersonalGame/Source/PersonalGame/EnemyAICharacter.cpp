@@ -18,30 +18,24 @@ AEnemyAICharacter::AEnemyAICharacter()
 	EnemyLogicComponent = CreateDefaultSubobject <UEnemyLogicComponent>("Logic Component");
 	HeadCollisionSphere = CreateDefaultSubobject<USphereComponent>("Head Sphere Collision");
 	HeadCollisionSphere->SetupAttachment(this->GetMesh());
-	this->GetCapsuleComponent()->ComponentTags.Add("Body");
-	HeadCollisionSphere->ComponentTags.Add("Head");
+	this->GetCapsuleComponent()->ComponentTags.Add(BodyCollisionTag);
+	HeadCollisionSphere->ComponentTags.Add(HeadCollisionTag);
 	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AEnemyAICharacter::Die);
 	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AEnemyAICharacter::EndOnShot);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_NavWalking);
 }
 
-
-
-
-
-
 void AEnemyAICharacter::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags)
 {
-	
-	if (bIsMoving)
+	if (IsMoving_Implementation())
 	{
 		StopMoving();
 	}
 	if (ComponentTags.Num() > 0)
 	{
-		if (ComponentTags.Find(FName("Head")) != INDEX_NONE)
+		if (ComponentTags.Find(FName(HeadCollisionTag)) != INDEX_NONE)
 		{
-			EnemyLogicComponent->TakeDamageFromPlayer(Damage * 10);
+			EnemyLogicComponent->TakeDamageFromPlayer(Damage * HeadShotMultiplier);
 		}
 		else
 		{
@@ -114,7 +108,7 @@ void AEnemyAICharacter::EndOnShot()
 
 void AEnemyAICharacter::StopMoving()
 {
-	if (bIsMoving)
+	if (IsMoving_Implementation())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AI should stop moving"))
 		bWasMoving = true;

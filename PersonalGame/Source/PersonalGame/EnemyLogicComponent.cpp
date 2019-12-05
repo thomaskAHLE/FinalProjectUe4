@@ -141,12 +141,3 @@ void UEnemyLogicComponent::Die()
 }
 
 
-
-// Called every frame
-void UEnemyLogicComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-

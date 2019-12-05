@@ -5,6 +5,7 @@
 #include "OnRailPawnEnemy.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "OnRailPawnPlayer.h"
 #include "OnRailSplineActor.h"
@@ -15,12 +16,19 @@
 
 AOnRailPawnEnemy::AOnRailPawnEnemy()
 {
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Enemy Mesh");
-	SkeletalMesh->SetupAttachment(RootComponent);
-
 	CollisionCapsule = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
-	CollisionCapsule->SetupAttachment(SkeletalMesh);
+	CollisionCapsule->SetupAttachment(RootComponent);
 	CollisionCapsule->SetGenerateOverlapEvents(true);
+	CollisionCapsule->ComponentTags.Add(BodyCollisionTag);
+
+	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Enemy Mesh");
+	SkeletalMesh->SetupAttachment(CollisionCapsule);
+
+	HeadCollisionSphere = CreateDefaultSubobject<USphereComponent>("HeadCollisionComponent");
+	HeadCollisionSphere->SetupAttachment(SkeletalMesh);
+	HeadCollisionSphere->SetGenerateOverlapEvents(true);
+	HeadCollisionSphere->ComponentTags.Add(HeadCollisionTag);
+
 	EnemyLogicComponent = CreateDefaultSubobject<UEnemyLogicComponent>("Logic Component");
 	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AOnRailPawnEnemy::Die);
 	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AOnRailPawnEnemy::EndOnShot);
@@ -29,15 +37,29 @@ AOnRailPawnEnemy::AOnRailPawnEnemy()
 
 
 
+UEnemyLogicComponent* AOnRailPawnEnemy::GetLogicComponent()
+{
+	return EnemyLogicComponent;
+}
+
 void AOnRailPawnEnemy::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags)
 {
-	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
+	
+	if (IsMoving_Implementation())
 	{
-		RailToFollow->StopMoving();
+		StopMoving();
 	}
-	if (EnemyLogicComponent != nullptr)
+	if (ComponentTags.Num() > 0)
 	{
-		EnemyLogicComponent->TakeDamageFromPlayer(Damage);
+		if (ComponentTags.Find(FName(HeadCollisionTag)) != INDEX_NONE)
+		{
+			UE_LOG(LogTemp, Error, TEXT("HEADSHOT!"));
+			EnemyLogicComponent->TakeDamageFromPlayer(Damage * HeadShotMultiplier);
+		}
+		else
+		{
+			EnemyLogicComponent->TakeDamageFromPlayer(Damage);
+		}
 	}
 }
 
@@ -53,7 +75,6 @@ bool AOnRailPawnEnemy::IsDead_Implementation()
 
 bool AOnRailPawnEnemy::WasDamaged_Implementation()
 {
-	
 	return EnemyLogicComponent->GetWasShot();
 }
 
@@ -78,9 +99,9 @@ void AOnRailPawnEnemy::Attack_Implementation()
 
 void AOnRailPawnEnemy::EndOnShot()
 {
-	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
+	if (!bStartedAttacking)
 	{
-		RailToFollow->StartMoving();
+		StartMoving();
 	}
 }
 
@@ -98,6 +119,22 @@ bool AOnRailPawnEnemy::IsAttacking_Implementation()
 bool AOnRailPawnEnemy::IsMoving_Implementation()
 {
 	return 0.f < GetEnemyVelocity();
+}
+
+void AOnRailPawnEnemy::StartMoving()
+{
+	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
+	{
+		RailToFollow->StopMoving();
+	}
+}
+
+void AOnRailPawnEnemy::StopMoving()
+{
+	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
+	{
+		RailToFollow->StartMoving();
+	}
 }
 
 void AOnRailPawnEnemy::DestroyWrapper()

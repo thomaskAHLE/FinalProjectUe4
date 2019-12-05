@@ -47,6 +47,9 @@ public:
 		class UEnemyLogicComponent* GetLogicComponent();
 
 protected:
+
+	UPROPERTY(EditAnywhere)
+	float HeadShotMultiplier = 2.f;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -83,4 +86,7 @@ protected:
 
 	UFUNCTION()
 	void DestroyWrapper();
+
+	FName HeadCollisionTag = "Head";
+	FName BodyCollisionTag = "Body";
 };

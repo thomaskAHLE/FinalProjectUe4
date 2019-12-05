@@ -41,10 +41,15 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
 
-	
+	UFUNCTION(BlueprintCallable)
+	class UEnemyLogicComponent* GetLogicComponent();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+	float HeadShotMultiplier = 2.f;
 
 	UFUNCTION(BlueprintCallable)
 	void EndOnShot();
@@ -54,6 +59,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		class UCapsuleComponent * CollisionCapsule;
+
+	UPROPERTY(EditAnywhere)
+	class USphereComponent * HeadCollisionSphere;
+
 
 	UPROPERTY(VisibleAnywhere)
 	class UEnemyLogicComponent * EnemyLogicComponent;
@@ -65,6 +74,19 @@ protected:
 
 	bool bStartedAttacking;
 
+	UFUNCTION(BlueprintCallable)
+	void StartMoving();
+
+	UFUNCTION(BlueprintCallable)
+	void StopMoving();
+
+	
+
+
 	UFUNCTION()
 	void DestroyWrapper();
+
+	FName HeadCollisionTag = "Head";
+	FName BodyCollisionTag = "Body";
+
 };
