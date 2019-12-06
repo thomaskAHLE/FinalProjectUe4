@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "EnemyAttackComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -20,9 +21,20 @@ AEnemyAICharacter::AEnemyAICharacter()
 	HeadCollisionSphere->SetupAttachment(this->GetMesh());
 	this->GetCapsuleComponent()->ComponentTags.Add(BodyCollisionTag);
 	HeadCollisionSphere->ComponentTags.Add(HeadCollisionTag);
-	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AEnemyAICharacter::Die);
-	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AEnemyAICharacter::EndOnShot);
+	EnemyLogicComponent->OnDie.AddDynamic(this, &AEnemyAICharacter::Die);
+	EnemyLogicComponent->OnPostTookDamage.AddDynamic(this, &AEnemyAICharacter::EndOnShot);
+	EnemyLogicComponent->OnAttack.AddDynamic(this, &AEnemyAICharacter::Attack);
+
+
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_NavWalking);
+}
+
+void AEnemyAICharacter::Attack_Implementation(class AActor* ActorToAttack, float DamageToDeal)
+{
+	if (EnemyAttackComponent != nullptr)
+	{
+		EnemyAttackComponent->Attack(ActorToAttack, DamageToDeal, AttackStartPos);
+	}
 }
 
 void AEnemyAICharacter::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags)
@@ -42,7 +54,6 @@ void AEnemyAICharacter::OnShot_Implementation(float Damage, FVector HitLocation,
 		{
 			EnemyLogicComponent->TakeDamageFromPlayer(Damage);
 		}
-
 	}
 }
 
@@ -74,19 +85,24 @@ bool AEnemyAICharacter::WasDamaged_Implementation()
 
 void AEnemyAICharacter::Die_Implementation()
 {
+	if (OnDie.IsBound())
+	{
+		OnDie.Broadcast();
+	}
 	GetWorld()->GetTimerManager().SetTimer(DeathDelayTimerHandle, this, &AEnemyAICharacter::DestroyWrapper, DelayAfterDeathTime, false);
 }
 
-void AEnemyAICharacter::Attack_Implementation()
-{
-	bIsMoving = false;
-	bWasMoving = false;
-	EnemyLogicComponent->StartAttackingLoop();
-}
 
 UEnemyLogicComponent * AEnemyAICharacter::GetLogicComponent()
 {
 	return EnemyLogicComponent;
+}
+
+void AEnemyAICharacter::StartAttacking_Implementation()
+{
+	bIsMoving = false;
+	bWasMoving = false;
+	EnemyLogicComponent->StartAttackingLoop();
 }
 
 // Called when the game starts or when spawned
@@ -94,8 +110,13 @@ void AEnemyAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	bIsMoving = false;
+	EnemyAttackComponent = NewObject<UEnemyAttackComponent>(this, EnemyAttackComponentType);
+	if (EnemyAttackComponent != nullptr)
+	{
+		EnemyAttackComponent->RegisterComponent();
+	}
 	AIController = Cast<AEnemyAIController>(GetController());
-	AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::Attack);
+	AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::StartAttacking);
 	
 }
 

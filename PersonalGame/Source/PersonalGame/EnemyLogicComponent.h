@@ -10,6 +10,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDieSignature);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTookDamageSignature, float /*Damage*/, Damage);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttackSignature, class AActor *, ActorToAttack, float /*Damage*/, DamageDealt);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPostTookDamageSignature);
 
 
@@ -28,13 +30,16 @@ public:
 	void StartAttackingLoop();
 
 	UPROPERTY(BlueprintAssignable)
-	mutable FDieSignature EnemyLogicComponent_Die;
+	FDieSignature OnDie;
 
 	UPROPERTY(BlueprintAssignable)
-	mutable FOnTookDamageSignature EnemyLogicComponent_TookDamage;
+	FOnTookDamageSignature OnTookDamage;
 	
 	UPROPERTY(BlueprintAssignable)
-	mutable FPostTookDamageSignature EnemyLogicComponent_PostTookDamage;
+	FPostTookDamageSignature OnPostTookDamage;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackSignature OnAttack;
 
 	UFUNCTION()
 	void TakeDamageFromPlayer(float Damage = 1.f);

@@ -11,17 +11,21 @@
 /**
  * 
  */
-UCLASS()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRailEnemyDieSignature);
+UCLASS(Abstract)
 class PERSONALGAME_API AOnRailPawnEnemy : public AOnRailPawn, public IShootableInterface, public IEnemyInterface
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnRailEnemyDieSignature OnDie;
+
 	AOnRailPawnEnemy();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
 	void OnShot(float Damage, FVector HitLocation,const TArray<FName>& ComponentTags);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
-		void Attack();
+		void Attack(class AActor* ActorToAttack, float DamageToDeal);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 		void Die();
@@ -41,6 +45,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
+	void StartAttacking();
 	UFUNCTION(BlueprintCallable)
 	class UEnemyLogicComponent* GetLogicComponent();
 
@@ -79,9 +85,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void StopMoving();
-
-	
-
 
 	UFUNCTION()
 	void DestroyWrapper();

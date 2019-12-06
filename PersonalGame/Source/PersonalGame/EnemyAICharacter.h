@@ -9,8 +9,9 @@
 #include "EnemyAICharacter.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIEnemyDieSignature);
 
-UCLASS()
+UCLASS(Abstract)
 class PERSONALGAME_API AEnemyAICharacter : public ACharacter, public IShootableInterface,  public IEnemyInterface
 {
 	GENERATED_BODY()
@@ -19,11 +20,14 @@ public:
 	// Sets default values for this character's properties
 	AEnemyAICharacter();
 
+	UPROPERTY(BlueprintAssignable)
+	FOnAIEnemyDieSignature OnDie;
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
 	void OnShot(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
-		void Attack();
+		void Attack(class AActor* ActorToAttack, float DamageToDeal);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 		void Die();
@@ -45,8 +49,18 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		class UEnemyLogicComponent* GetLogicComponent();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
+	void StartAttacking();
+
 
 protected:
+
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UEnemyAttackComponent> EnemyAttackComponentType;
+	
+	UPROPERTY(EditAnywhere)
+	class UEnemyAttackComponent * EnemyAttackComponent;
 
 	UPROPERTY(EditAnywhere)
 	float HeadShotMultiplier = 2.f;
@@ -83,6 +97,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void StartMoving();
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector AttackStartPos = FVector(0.f, 0.f, 0.f);
 
 	UFUNCTION()
 	void DestroyWrapper();

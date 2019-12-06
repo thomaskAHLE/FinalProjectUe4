@@ -43,13 +43,10 @@ void UEnemyLogicComponent::AttackPlayer()
 	bIsAttacking = true;
 	if (ActorToAttack != nullptr)
 	{
-		FDamageEvent DamageEvent;
-		AController * MyController = nullptr;
-		if (GetOwner() != nullptr)
+		if (OnAttack.IsBound())
 		{
-			MyController = GetOwner()->GetInstigatorController();
+			OnAttack.Broadcast(ActorToAttack, DamageCaused);
 		}
-		ActorToAttack->TakeDamage(DamageCaused, DamageEvent, MyController, GetOwner());
 	}
 	else
 	{
@@ -69,7 +66,6 @@ void UEnemyLogicComponent::StartAttackingLoop()
 
 void UEnemyLogicComponent::TakeDamageFromPlayer(float Damage /*=1.f*/)
 {
-	UE_LOG(LogTemp, Error, TEXT("Took Damage from player"))
 	bWasShot = true;
 	CurrentHealth -= Damage;
 	if (bStartedAttackingLoop)
@@ -83,9 +79,9 @@ void UEnemyLogicComponent::TakeDamageFromPlayer(float Damage /*=1.f*/)
 	}
 	else
 	{
-		if (EnemyLogicComponent_TookDamage.IsBound())
+		if (OnTookDamage.IsBound())
 		{
-			EnemyLogicComponent_TookDamage.Broadcast(Damage);
+			OnTookDamage.Broadcast(Damage);
 		}
 		GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &UEnemyLogicComponent::PostTookDamageFromPlayer, DelayAfterShotTime, false);
 	}
@@ -115,9 +111,9 @@ bool UEnemyLogicComponent::GetIsAttacking() const
 void UEnemyLogicComponent::PostTookDamageFromPlayer()
 {
 	bWasShot = false;
-	if (EnemyLogicComponent_PostTookDamage.IsBound())
+	if (OnPostTookDamage.IsBound())
 	{
-		EnemyLogicComponent_PostTookDamage.Broadcast();
+		OnPostTookDamage.Broadcast();
 	}
 	if (bStartedAttackingLoop)
 	{
@@ -133,9 +129,9 @@ void UEnemyLogicComponent::Die()
 		bIsAttacking = false;
 		bWasShot = false;
 		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-		if (EnemyLogicComponent_Die.IsBound())
+		if (OnDie.IsBound())
 		{
-			EnemyLogicComponent_Die.Broadcast();
+			OnDie.Broadcast();
 		}
 	}
 }

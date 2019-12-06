@@ -30,12 +30,26 @@ AOnRailPawnEnemy::AOnRailPawnEnemy()
 	HeadCollisionSphere->ComponentTags.Add(HeadCollisionTag);
 
 	EnemyLogicComponent = CreateDefaultSubobject<UEnemyLogicComponent>("Logic Component");
-	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AOnRailPawnEnemy::Die);
-	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AOnRailPawnEnemy::EndOnShot);
+	EnemyLogicComponent->OnDie.AddDynamic(this, &AOnRailPawnEnemy::Die);
+	EnemyLogicComponent->OnAttack.AddDynamic(this, &AOnRailPawnEnemy::Attack);
+	EnemyLogicComponent->OnPostTookDamage.AddDynamic(this, &AOnRailPawnEnemy::EndOnShot);
 }
 
 
 
+
+void AOnRailPawnEnemy::Attack_Implementation(class AActor* ActorToAttack, float DamageToDeal)
+{
+	FDamageEvent DamageEvent;
+	AController * MyController = GetController();
+	ActorToAttack->TakeDamage(DamageToDeal, DamageEvent, MyController, this);
+}
+
+void AOnRailPawnEnemy::StartAttacking_Implementation()
+{
+	StopMoving();
+	EnemyLogicComponent->StartAttackingLoop();
+}
 
 UEnemyLogicComponent* AOnRailPawnEnemy::GetLogicComponent()
 {
@@ -83,18 +97,9 @@ void AOnRailPawnEnemy::BeginPlay()
 	Super::BeginPlay();
 	if (RailToFollow != nullptr)
 	{
-		RailToFollow->EndOfSplineSignature.AddDynamic(this, &AOnRailPawnEnemy::Attack);
+		RailToFollow->EndOfSplineSignature.AddDynamic(this, &AOnRailPawnEnemy::StartAttacking);
 	}
 	
-}
-
-void AOnRailPawnEnemy::Attack_Implementation()
-{
-	bStartedAttacking = true;
-	if (EnemyLogicComponent != nullptr)
-	{
-		EnemyLogicComponent->StartAttackingLoop();
-	}
 }
 
 void AOnRailPawnEnemy::EndOnShot()
@@ -107,6 +112,10 @@ void AOnRailPawnEnemy::EndOnShot()
 
 void AOnRailPawnEnemy::Die_Implementation()
 {
+	if (OnDie.IsBound())
+	{
+		OnDie.Broadcast();
+	}
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	GetWorld()->GetTimerManager().SetTimer(DeathDelayTimerHandle, this, &AOnRailPawnEnemy::DestroyWrapper, DelayAfterDeathTime, false);
 }

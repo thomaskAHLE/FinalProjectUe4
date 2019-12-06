@@ -24,7 +24,7 @@ class PERSONALGAME_API IEnemyInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
-	void Attack();
+	void Attack(class AActor* ActorToAttack, float DamageToDeal);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 	void Die();
@@ -44,7 +44,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 	bool WasDamaged();
 
-	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
+	void StartAttacking();
 
 
 };

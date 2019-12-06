@@ -59,7 +59,7 @@ protected:
 	int32 StreakRequiredToSecondDamageMultiplier = 3;
 
 	UPROPERTY(EditAnywhere)
-	float BaseDamageMultiplierValue = 2.f;
+	float BaseDamageMultiplierValue = 1.f;
 
 	UPROPERTY(EditAnywhere)
 	float FirstDamageMultiplierValue = 2.f;
