@@ -107,6 +107,7 @@ void AOnRailPawnEnemy::EndOnShot()
 
 void AOnRailPawnEnemy::Die_Implementation()
 {
+	UE_LOG(LogTemp, Error, TEXT("%s Dead"), *GetName())
 	if (OnDie.IsBound())
 	{
 		OnDie.Broadcast();

@@ -145,6 +145,7 @@ void UEnemyLogicComponent::PostTookDamageFromPlayer()
 
 void UEnemyLogicComponent::Die()
 {
+	UE_LOG(LogTemp, Error, TEXT("Dead"));
 	if (!bIsDead)
 	{
 		bIsDead = true;
