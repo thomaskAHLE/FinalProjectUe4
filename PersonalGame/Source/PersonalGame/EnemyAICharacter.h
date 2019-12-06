@@ -8,7 +8,10 @@
 #include "ShootableInterface.h"
 #include "EnemyAICharacter.generated.h"
 
-UCLASS()
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIEnemyDieSignature);
+
+UCLASS(Abstract)
 class PERSONALGAME_API AEnemyAICharacter : public ACharacter, public IShootableInterface,  public IEnemyInterface
 {
 	GENERATED_BODY()
@@ -17,11 +20,14 @@ public:
 	// Sets default values for this character's properties
 	AEnemyAICharacter();
 
+	UPROPERTY(BlueprintAssignable)
+	FOnAIEnemyDieSignature OnDie;
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
-	void OnShot(float Damage);
+	void OnShot(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
-		void Attack();
+		void Attack(class AActor* ActorToAttack, float DamageToDeal);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 		void Die();
@@ -41,13 +47,25 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
+	void StartAttacking();
+
 
 protected:
+
+
+	
+
+	UPROPERTY(EditAnywhere)
+	float HeadShotMultiplier = 2.f;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
-	UEnemyLogicComponent * EnemyLogicComponent;
+		class UEnemyLogicComponent * EnemyLogicComponent;
+
+	UPROPERTY(EditAnywhere)
+	class USphereComponent * HeadCollisionSphere;
 
 	UPROPERTY(EditAnywhere)
 	class AActor * ActorToMoveTo;
@@ -68,9 +86,18 @@ protected:
 	bool bIsMoving = true;
 	bool bWasMoving = false;
 
+	UFUNCTION(BlueprintCallable)
 	void StopMoving();
+
+	UFUNCTION(BlueprintCallable)
 	void StartMoving();
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector AttackStartPos = FVector(0.f, 0.f, 0.f);
 
 	UFUNCTION()
 	void DestroyWrapper();
+
+	FName HeadCollisionTag = "Head";
+	FName BodyCollisionTag = "Body";
 };

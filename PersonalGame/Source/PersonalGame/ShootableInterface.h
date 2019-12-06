@@ -21,7 +21,6 @@ class PERSONALGAME_API IShootableInterface
 	GENERATED_BODY()
 	public:
 		UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
-		void OnShot(float Damage);
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
-public:
+		void OnShot(float Damage, FVector HitLocation, const TArray<FName> &ComponentTags);
+		
 };

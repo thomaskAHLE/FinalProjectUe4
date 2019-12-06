@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Actor.h"
+#include "EnemyAttackComponent.h"
 
 // Sets default values for this component's properties
 UEnemyLogicComponent::UEnemyLogicComponent()
@@ -23,6 +24,15 @@ void UEnemyLogicComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentHealth = MaxHealth;
+	EnemyAttackComponent = NewObject<UEnemyAttackComponent>(GetOwner(), EnemyAttackComponentType);
+	if (EnemyAttackComponentType != nullptr)
+	{
+		EnemyAttackComponent->RegisterComponent();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Could not generate enemy attack component for "), *GetName());
+	}
 	if (ActorToAttack == nullptr)
 	{
 		ActorToAttack = GetWorld()->GetFirstPlayerController()->GetPawn();
@@ -43,13 +53,14 @@ void UEnemyLogicComponent::AttackPlayer()
 	bIsAttacking = true;
 	if (ActorToAttack != nullptr)
 	{
-		FDamageEvent DamageEvent;
-		AController * MyController = nullptr;
-		if (GetOwner() != nullptr)
+		if (OnAttack.IsBound())
 		{
-			MyController = GetOwner()->GetInstigatorController();
+			OnAttack.Broadcast(ActorToAttack, DamageCaused);
 		}
-		ActorToAttack->TakeDamage(DamageCaused, DamageEvent, MyController, GetOwner());
+		if (EnemyAttackComponent != nullptr)
+		{
+			EnemyAttackComponent->Attack(ActorToAttack, DamageCaused, StartAttackPosition);
+		}
 	}
 	else
 	{
@@ -69,26 +80,39 @@ void UEnemyLogicComponent::StartAttackingLoop()
 
 void UEnemyLogicComponent::TakeDamageFromPlayer(float Damage /*=1.f*/)
 {
-	UE_LOG(LogTemp, Error, TEXT("Took Damage from player"))
-	bWasShot = true;
-	CurrentHealth -= Damage;
-	if (bStartedAttackingLoop)
+	if (!bIsDead)
 	{
-		bIsAttacking = false;
-		GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
-	}
-	if (CurrentHealth <= 0)
-	{
-		Die();
-	}
-	else
-	{
-		if (EnemyLogicComponent_TookDamage.IsBound())
+		bWasShot = true;
+		CurrentHealth -= Damage;
+		if (bStartedAttackingLoop)
 		{
-			EnemyLogicComponent_TookDamage.Broadcast(Damage);
+			bIsAttacking = false;
+			GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
 		}
-		GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &UEnemyLogicComponent::PostTookDamageFromPlayer, DelayAfterShotTime, false);
+		if (CurrentHealth <= 0)
+		{
+			Die();
+		}
+		else
+		{
+			if (OnTookDamage.IsBound())
+			{
+				OnTookDamage.Broadcast(Damage);
+			}
+			GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &UEnemyLogicComponent::PostTookDamageFromPlayer, DelayAfterShotTime, false);
+		}
 	}
+}
+
+void UEnemyLogicComponent::StopAttackingLoop()
+{
+	bStartedAttackingLoop = false;
+	GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
+}
+
+void UEnemyLogicComponent::UpdateAttackStartPosition(FVector AttackStartPosition)
+{
+	StartAttackPosition = AttackStartPosition;
 }
 
 bool UEnemyLogicComponent::GetIsDead() const 
@@ -109,9 +133,9 @@ bool UEnemyLogicComponent::GetIsAttacking() const
 void UEnemyLogicComponent::PostTookDamageFromPlayer()
 {
 	bWasShot = false;
-	if (EnemyLogicComponent_PostTookDamage.IsBound())
+	if (OnPostTookDamage.IsBound())
 	{
-		EnemyLogicComponent_PostTookDamage.Broadcast();
+		OnPostTookDamage.Broadcast();
 	}
 	if (bStartedAttackingLoop)
 	{
@@ -121,23 +145,18 @@ void UEnemyLogicComponent::PostTookDamageFromPlayer()
 
 void UEnemyLogicComponent::Die()
 {
-	bIsDead = true;
-	bIsAttacking = false;
-	bWasShot = false;
-	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	if (EnemyLogicComponent_Die.IsBound())
+	UE_LOG(LogTemp, Error, TEXT("Dead"));
+	if (!bIsDead)
 	{
-		EnemyLogicComponent_Die.Broadcast();
+		bIsDead = true;
+		bIsAttacking = false;
+		bWasShot = false;
+		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+		if (OnDie.IsBound())
+		{
+			OnDie.Broadcast();
+		}
 	}
 }
 
-
-
-// Called every frame
-void UEnemyLogicComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
 

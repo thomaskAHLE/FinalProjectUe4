@@ -11,18 +11,21 @@
 /**
  * 
  */
-UCLASS()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRailEnemyDieSignature);
+UCLASS(Abstract)
 class PERSONALGAME_API AOnRailPawnEnemy : public AOnRailPawn, public IShootableInterface, public IEnemyInterface
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnRailEnemyDieSignature OnDie;
+
 	AOnRailPawnEnemy();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
-	void OnShot(float Damage);
-	virtual void OnShot_Implementation(float Damage) override;
+	void OnShot(float Damage, FVector HitLocation,const TArray<FName>& ComponentTags);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
-		void Attack();
+		void Attack(class AActor* ActorToAttack, float DamageToDeal);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 		void Die();
@@ -41,15 +44,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
-	
 
-// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
+	void StartAttacking();
 
-	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+	float HeadShotMultiplier = 2.f;
 
 	UFUNCTION(BlueprintCallable)
 	void EndOnShot();
@@ -59,6 +63,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		class UCapsuleComponent * CollisionCapsule;
+
+	UPROPERTY(EditAnywhere)
+	class USphereComponent * HeadCollisionSphere;
+
 
 	UPROPERTY(VisibleAnywhere)
 	class UEnemyLogicComponent * EnemyLogicComponent;
@@ -70,6 +78,19 @@ protected:
 
 	bool bStartedAttacking;
 
+	UFUNCTION(BlueprintCallable)
+	void StartMoving();
+
+	UFUNCTION(BlueprintCallable)
+	void StopMoving();
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector AttackStartPos = FVector(0.f, 0.f, 0.f);
+
 	UFUNCTION()
 	void DestroyWrapper();
+
+	FName HeadCollisionTag = "Head";
+	FName BodyCollisionTag = "Body";
+
 };

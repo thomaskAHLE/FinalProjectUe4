@@ -10,6 +10,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDieSignature);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTookDamageSignature, float /*Damage*/, Damage);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttackSignature, class AActor *, ActorToAttack, float /*Damage*/, DamageDealt);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPostTookDamageSignature);
 
 
@@ -28,17 +30,25 @@ public:
 	void StartAttackingLoop();
 
 	UPROPERTY(BlueprintAssignable)
-	mutable FDieSignature EnemyLogicComponent_Die;
+	FDieSignature OnDie;
 
 	UPROPERTY(BlueprintAssignable)
-	mutable FOnTookDamageSignature EnemyLogicComponent_TookDamage;
+	FOnTookDamageSignature OnTookDamage;
 	
 	UPROPERTY(BlueprintAssignable)
-	mutable FPostTookDamageSignature EnemyLogicComponent_PostTookDamage;
+	FPostTookDamageSignature OnPostTookDamage;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackSignature OnAttack;
 
 	UFUNCTION()
 	void TakeDamageFromPlayer(float Damage = 1.f);
 
+	UFUNCTION()
+	void StopAttackingLoop();
+
+	UFUNCTION(BlueprintCallable)
+	void  UpdateAttackStartPosition(FVector AttackStartPosition);
 	/*Getters*/
 	bool GetIsDead() const ;
 	bool GetWasShot() const ;
@@ -47,6 +57,12 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UEnemyAttackComponent> EnemyAttackComponentType;
+
+	UPROPERTY(VisibleAnywhere)
+	class UEnemyAttackComponent * EnemyAttackComponent;
 
 	UPROPERTY(EditAnywhere)
 		int MaxHealth = 10;
@@ -69,10 +85,7 @@ protected:
 		float DelayBetweenAttacks = 2.6f;
 
 	UPROPERTY(EditAnywhere, Category = Timer)
-		float DelayAfterShotTime = 2.6f;
-
-	UPROPERTY(EditAnywhere, Category = Timer)
-	float DelayAfterDeathTime = 3.f;
+	float DelayAfterShotTime = 2.6f;
 
 	UPROPERTY(EditAnywhere, Category = Damage)
 	float DamageCaused = 1.f;
@@ -80,11 +93,12 @@ protected:
 	UFUNCTION()
 	void AttackPlayer();
 
+	UPROPERTY(EditAnywhere)
+	FVector StartAttackPosition = FVector(0.f, 0.f, 0.f);
+
 	FTimerHandle AttackDelayTimerHandle;
 
 	FTimerHandle ShotDelayTimerHandle;
-
-	FTimerHandle DeathDelayTimerHandle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
 	bool bStartedAttackingLoop = false;
@@ -98,9 +112,4 @@ protected:
 
 	UFUNCTION()
 	void Die();
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
 };

@@ -30,6 +30,11 @@ ABulletActor::ABulletActor()
 	this->InitialLifeSpan = LifeSpan;
 }
 
+void ABulletActor::SetBulletMultiplier(const float BulletDamageMultiplier)
+{
+	BulletDamage *= BulletDamageMultiplier;
+}
+
 void ABulletActor::DestroyWrapper()
 {
 	Destroy();
@@ -51,8 +56,13 @@ void ABulletActor::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
 			
 			if (OtherActor->GetClass()->ImplementsInterface(UShootableInterface::StaticClass()))
 			{
-				IShootableInterface::Execute_OnShot(OtherActor, BulletDamage);
+				if (OnHitShootable.IsBound())
+				{
+					OnHitShootable.Broadcast();
+				}
+				IShootableInterface::Execute_OnShot(OtherActor, BulletDamage, GetActorLocation(), OtherComp->ComponentTags);
 				GetWorld()->GetTimerManager().SetTimer(DelayBeforeDestroyTimerHandle, this, &ABulletActor::DestroyWrapper, DelayBeforeDestroy, false);
+				
 			}
 			else
 			{

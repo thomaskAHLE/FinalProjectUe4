@@ -10,6 +10,8 @@
 /**
  *
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDieSignature);
+
 UCLASS()
 class PERSONALGAME_API AOnRailPawnPlayer : public AOnRailPawn
 {
@@ -31,7 +33,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetAmmo() const;
 
+	UFUNCTION()
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintCallable)
+		class UPlayerScoreComponent * GetPlayerScoreComponent() const;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnDieSignature OnDie;
 
 protected:
 
@@ -45,7 +54,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Gun)
 	class UStaticMeshComponent * GunMesh;
 
-	
+	UPROPERTY(VisibleAnywhere)
+	class UPlayerScoreComponent * PlayerScoreComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class USoundBase* FireSound;
@@ -80,6 +90,9 @@ protected:
 	//Sets shooting state variables then calls timer function Shoot 
 	void Shoot();
 
+	UFUNCTION()
+	void GameWon();
+
 	//Used to add delay between reload call and EndReload
 	FTimerHandle ReloadTimerHandle;
 
@@ -113,9 +126,13 @@ protected:
 	//Converts mouse position to world space, then rotates gun to look at that position 
 	void AimGun();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Die();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
     class USoundBase* ReloadSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class USoundBase* PlayerHitSound;
 
 };

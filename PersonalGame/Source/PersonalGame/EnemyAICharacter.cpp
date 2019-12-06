@@ -6,6 +6,9 @@
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "EnemyAttackComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 AEnemyAICharacter::AEnemyAICharacter()
@@ -14,21 +17,39 @@ AEnemyAICharacter::AEnemyAICharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	AIControllerClass = AEnemyAIController::StaticClass();
 	EnemyLogicComponent = CreateDefaultSubobject <UEnemyLogicComponent>("Logic Component");
-	EnemyLogicComponent->EnemyLogicComponent_Die.AddDynamic(this, &AEnemyAICharacter::Die);
-	EnemyLogicComponent->EnemyLogicComponent_PostTookDamage.AddDynamic(this, &AEnemyAICharacter::EndOnShot);
+	HeadCollisionSphere = CreateDefaultSubobject<USphereComponent>("Head Sphere Collision");
+	HeadCollisionSphere->SetupAttachment(this->GetMesh());
+	this->GetCapsuleComponent()->ComponentTags.Add(BodyCollisionTag);
+	HeadCollisionSphere->ComponentTags.Add(HeadCollisionTag);
+	EnemyLogicComponent->OnDie.AddDynamic(this, &AEnemyAICharacter::Die);
+	EnemyLogicComponent->OnPostTookDamage.AddDynamic(this, &AEnemyAICharacter::EndOnShot);
+	EnemyLogicComponent->OnAttack.AddDynamic(this, &AEnemyAICharacter::Attack);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_NavWalking);
 }
 
-
-
-
-void AEnemyAICharacter::OnShot_Implementation(float Damage)
+void AEnemyAICharacter::Attack_Implementation(class AActor* ActorToAttack, float DamageToDeal)
 {
-	if (bIsMoving)
+
+}
+
+void AEnemyAICharacter::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags)
+{
+	UE_LOG(LogTemp, Error, TEXT("Damage taken %f"), Damage);
+	if (IsMoving_Implementation())
 	{
 		StopMoving();
 	}
-	EnemyLogicComponent->TakeDamageFromPlayer(Damage);
+	if (ComponentTags.Num() > 0)
+	{
+		if (ComponentTags.Find(FName(HeadCollisionTag)) != INDEX_NONE)
+		{
+			EnemyLogicComponent->TakeDamageFromPlayer(Damage * HeadShotMultiplier);
+		}
+		else
+		{
+			EnemyLogicComponent->TakeDamageFromPlayer(Damage);
+		}
+	}
 }
 
 bool AEnemyAICharacter::IsMoving_Implementation()
@@ -59,11 +80,18 @@ bool AEnemyAICharacter::WasDamaged_Implementation()
 
 void AEnemyAICharacter::Die_Implementation()
 {
+	if (OnDie.IsBound())
+	{
+		OnDie.Broadcast();
+	}
 	GetWorld()->GetTimerManager().SetTimer(DeathDelayTimerHandle, this, &AEnemyAICharacter::DestroyWrapper, DelayAfterDeathTime, false);
 }
 
-void AEnemyAICharacter::Attack_Implementation()
+void AEnemyAICharacter::StartAttacking_Implementation()
 {
+	bIsMoving = false;
+	bWasMoving = false;
+	EnemyLogicComponent->UpdateAttackStartPosition(AttackStartPos);
 	EnemyLogicComponent->StartAttackingLoop();
 }
 
@@ -71,20 +99,10 @@ void AEnemyAICharacter::Attack_Implementation()
 void AEnemyAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	bIsMoving = false;
 	AIController = Cast<AEnemyAIController>(GetController());
-	if (AIController != nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Has Controller"));
-		if (ActorToMoveTo == nullptr)
-		{
-			ActorToMoveTo = GetWorld()->GetFirstPlayerController()->GetPawn();
-		}
-		AIController->TravelToActor(ActorToMoveTo);
-		AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::Attack);
-
-	}
-	bIsMoving = true;
-	StartMoving();
+	AIController->EnemyAIController_MoveCompletedSuccess.AddDynamic(this, &AEnemyAICharacter::StartAttacking);
+	
 }
 
 void AEnemyAICharacter::EndOnShot()
@@ -97,13 +115,15 @@ void AEnemyAICharacter::EndOnShot()
 
 void AEnemyAICharacter::StopMoving()
 {
-
-	if (bIsMoving)
+	if (IsMoving_Implementation())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AI should stop moving"))
 		bWasMoving = true;
 		bIsMoving = false;
-		AIController->StopMovement();
+		if (AIController != nullptr)
+		{
+			AIController->StopMovement();
+		}
 	}
 	else
 	{
@@ -113,11 +133,24 @@ void AEnemyAICharacter::StopMoving()
 
 void AEnemyAICharacter::StartMoving()
 {
-	if (!bIsMoving)
+	if (!bIsMoving && bWasMoving)
 	{
 		bIsMoving = true;
 		bWasMoving = false;
-		AIController->TravelToActor(ActorToMoveTo);
+		
+		if (AIController != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Has Controller"));
+			if (ActorToMoveTo == nullptr)
+			{
+				ActorToMoveTo = GetWorld()->GetFirstPlayerController()->GetPawn();
+			}
+			AIController->TravelToActor(ActorToMoveTo);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s can't stop moving because there isn't a controller"), *GetName())
+		}
 	}
 }
 

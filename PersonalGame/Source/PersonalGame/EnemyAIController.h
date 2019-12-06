@@ -18,8 +18,6 @@ class PERSONALGAME_API AEnemyAIController : public AAIController
 	GENERATED_BODY()
 
 public:
-	AEnemyAIController();
-
 
 	UFUNCTION(BlueprintCallable)
 	void TravelToActor(class AActor * ActorToTravelTo);
