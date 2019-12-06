@@ -52,7 +52,14 @@ void AEnemyProjectileActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (bMoveProjectileAlongSpline)
 	{
-		MoveAlongSpline(DeltaTime * SpeedMultiplier);
+		if (CurrentDistanceAlongSpline < SplineLength)
+		{
+			MoveAlongSpline(DeltaTime * SpeedMultiplier);
+		}
+		else
+		{
+			Destroy();
+		}
 	}
 }
 
@@ -60,7 +67,7 @@ void AEnemyProjectileActor::SetTargetAndStartProjectile(AActor * Target)
 {
 	TargetActor = Target;
 	ArcSpline->AddSplineWorldPoint(Target->GetActorLocation());
-	float SplineLength = ArcSpline->GetSplineLength();
+	SplineLength = ArcSpline->GetSplineLength();
 	FVector MiddleSplinePointLocation = ArcSpline->GetLocationAtDistanceAlongSpline(SplineLength / 2.f, ESplineCoordinateSpace::World);
 	MiddleSplinePointLocation.Z += AdditionalHeightAboveSplineAtMidPoint;
 	ArcSpline->AddSplinePoint(MiddleSplinePointLocation, ESplineCoordinateSpace::World);

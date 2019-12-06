@@ -80,6 +80,7 @@ bool AEnemyAICharacter::WasDamaged_Implementation()
 
 void AEnemyAICharacter::Die_Implementation()
 {
+	GetMesh()->SetGenerateOverlapEvents(false);
 	if (OnDie.IsBound())
 	{
 		OnDie.Broadcast();

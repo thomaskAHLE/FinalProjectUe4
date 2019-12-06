@@ -34,6 +34,7 @@ protected:
 	float CurrentDistanceAlongSpline;
 	void MoveAlongSpline(float DeltaDistance);
 
+	float SplineLength;
 	UPROPERTY(EditAnywhere)
 	float AdditionalHeightAboveSplineAtMidPoint = 60.f;
 	AActor * TargetActor;

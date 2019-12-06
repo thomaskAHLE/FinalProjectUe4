@@ -204,6 +204,7 @@ void AOnRailPawnPlayer::AimGun()
 
 void AOnRailPawnPlayer::Die_Implementation()
 {
+	
 	if (OnDie.IsBound())
 	{
 		OnDie.Broadcast();

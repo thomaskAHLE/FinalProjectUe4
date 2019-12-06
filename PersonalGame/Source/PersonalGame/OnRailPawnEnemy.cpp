@@ -108,6 +108,7 @@ void AOnRailPawnEnemy::EndOnShot()
 void AOnRailPawnEnemy::Die_Implementation()
 {
 	UE_LOG(LogTemp, Error, TEXT("%s Dead"), *GetName())
+	CollisionCapsule->SetGenerateOverlapEvents(false);
 	if (OnDie.IsBound())
 	{
 		OnDie.Broadcast();
@@ -144,6 +145,7 @@ void AOnRailPawnEnemy::StopMoving()
 
 void AOnRailPawnEnemy::DestroyWrapper()
 {
+	CollisionCapsule->SetGenerateOverlapEvents(false);
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	Destroy();
 }
