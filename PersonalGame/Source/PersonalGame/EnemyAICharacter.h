@@ -47,8 +47,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "EnemyState")
 		bool WasDamaged();
 
-	UFUNCTION(BlueprintCallable)
-		class UEnemyLogicComponent* GetLogicComponent();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 	void StartAttacking();
 
@@ -56,11 +54,7 @@ public:
 protected:
 
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UEnemyAttackComponent> EnemyAttackComponentType;
 	
-	UPROPERTY(EditAnywhere)
-	class UEnemyAttackComponent * EnemyAttackComponent;
 
 	UPROPERTY(EditAnywhere)
 	float HeadShotMultiplier = 2.f;

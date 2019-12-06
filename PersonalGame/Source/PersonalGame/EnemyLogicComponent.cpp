@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Actor.h"
+#include "EnemyAttackComponent.h"
 
 // Sets default values for this component's properties
 UEnemyLogicComponent::UEnemyLogicComponent()
@@ -23,6 +24,15 @@ void UEnemyLogicComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentHealth = MaxHealth;
+	EnemyAttackComponent = NewObject<UEnemyAttackComponent>(GetOwner(), EnemyAttackComponentType);
+	if (EnemyAttackComponentType != nullptr)
+	{
+		EnemyAttackComponent->RegisterComponent();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Could not generate enemy attack component for "), *GetName());
+	}
 	if (ActorToAttack == nullptr)
 	{
 		ActorToAttack = GetWorld()->GetFirstPlayerController()->GetPawn();
@@ -47,6 +57,10 @@ void UEnemyLogicComponent::AttackPlayer()
 		{
 			OnAttack.Broadcast(ActorToAttack, DamageCaused);
 		}
+		if (EnemyAttackComponent != nullptr)
+		{
+			EnemyAttackComponent->Attack(ActorToAttack, DamageCaused, StartAttackPosition);
+		}
 	}
 	else
 	{
@@ -66,24 +80,27 @@ void UEnemyLogicComponent::StartAttackingLoop()
 
 void UEnemyLogicComponent::TakeDamageFromPlayer(float Damage /*=1.f*/)
 {
-	bWasShot = true;
-	CurrentHealth -= Damage;
-	if (bStartedAttackingLoop)
+	if (!bIsDead)
 	{
-		bIsAttacking = false;
-		GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
-	}
-	if (CurrentHealth <= 0)
-	{
-		Die();
-	}
-	else
-	{
-		if (OnTookDamage.IsBound())
+		bWasShot = true;
+		CurrentHealth -= Damage;
+		if (bStartedAttackingLoop)
 		{
-			OnTookDamage.Broadcast(Damage);
+			bIsAttacking = false;
+			GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
 		}
-		GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &UEnemyLogicComponent::PostTookDamageFromPlayer, DelayAfterShotTime, false);
+		if (CurrentHealth <= 0)
+		{
+			Die();
+		}
+		else
+		{
+			if (OnTookDamage.IsBound())
+			{
+				OnTookDamage.Broadcast(Damage);
+			}
+			GetWorld()->GetTimerManager().SetTimer(ShotDelayTimerHandle, this, &UEnemyLogicComponent::PostTookDamageFromPlayer, DelayAfterShotTime, false);
+		}
 	}
 }
 
@@ -91,6 +108,11 @@ void UEnemyLogicComponent::StopAttackingLoop()
 {
 	bStartedAttackingLoop = false;
 	GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimerHandle);
+}
+
+void UEnemyLogicComponent::UpdateAttackStartPosition(FVector AttackStartPosition)
+{
+	StartAttackPosition = AttackStartPosition;
 }
 
 bool UEnemyLogicComponent::GetIsDead() const 

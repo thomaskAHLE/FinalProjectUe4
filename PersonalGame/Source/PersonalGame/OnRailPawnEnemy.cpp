@@ -40,21 +40,16 @@ AOnRailPawnEnemy::AOnRailPawnEnemy()
 
 void AOnRailPawnEnemy::Attack_Implementation(class AActor* ActorToAttack, float DamageToDeal)
 {
-	FDamageEvent DamageEvent;
-	AController * MyController = GetController();
-	ActorToAttack->TakeDamage(DamageToDeal, DamageEvent, MyController, this);
+
 }
 
 void AOnRailPawnEnemy::StartAttacking_Implementation()
 {
 	StopMoving();
+	EnemyLogicComponent->UpdateAttackStartPosition(AttackStartPos);
 	EnemyLogicComponent->StartAttackingLoop();
 }
 
-UEnemyLogicComponent* AOnRailPawnEnemy::GetLogicComponent()
-{
-	return EnemyLogicComponent;
-}
 
 void AOnRailPawnEnemy::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> & ComponentTags)
 {

@@ -47,8 +47,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Enemy")
 	void StartAttacking();
-	UFUNCTION(BlueprintCallable)
-	class UEnemyLogicComponent* GetLogicComponent();
 
 protected:
 	// Called when the game starts or when spawned
@@ -85,6 +83,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void StopMoving();
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector AttackStartPos = FVector(0.f, 0.f, 0.f);
 
 	UFUNCTION()
 	void DestroyWrapper();

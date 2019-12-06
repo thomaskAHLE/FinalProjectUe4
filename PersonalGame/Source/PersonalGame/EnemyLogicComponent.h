@@ -47,6 +47,8 @@ public:
 	UFUNCTION()
 	void StopAttackingLoop();
 
+	UFUNCTION(BlueprintCallable)
+	void  UpdateAttackStartPosition(FVector AttackStartPosition);
 	/*Getters*/
 	bool GetIsDead() const ;
 	bool GetWasShot() const ;
@@ -55,6 +57,12 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UEnemyAttackComponent> EnemyAttackComponentType;
+
+	UPROPERTY(VisibleAnywhere)
+	class UEnemyAttackComponent * EnemyAttackComponent;
 
 	UPROPERTY(EditAnywhere)
 		int MaxHealth = 10;
@@ -84,6 +92,9 @@ protected:
 	
 	UFUNCTION()
 	void AttackPlayer();
+
+	UPROPERTY(EditAnywhere)
+	FVector StartAttackPosition = FVector(0.f, 0.f, 0.f);
 
 	FTimerHandle AttackDelayTimerHandle;
 
