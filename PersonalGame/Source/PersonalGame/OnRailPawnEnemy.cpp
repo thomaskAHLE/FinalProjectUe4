@@ -131,7 +131,7 @@ void AOnRailPawnEnemy::StartMoving()
 {
 	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
 	{
-		RailToFollow->StopMoving();
+		RailToFollow->StartMoving();
 	}
 }
 
@@ -139,7 +139,7 @@ void AOnRailPawnEnemy::StopMoving()
 {
 	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
 	{
-		RailToFollow->StartMoving();
+		RailToFollow->StopMoving();
 	}
 }
 
