@@ -43,6 +43,14 @@ void AOnRailSplineActor::OnConstruction(const FTransform& Transform)
 		LastDefaultSpeedMultiplier = DefaultSpeedMultiplier;
 	}
 	EDITOR_ONLY_bUpdateDefaultSpeedMultiplier = false;
+	if (EDITOR_ONLY_bSetAllToDefaultSpeedMultiplier)
+	{
+		for (auto & speed : SpeedMultiplierToSplinePoint)
+		{
+			speed = DefaultSpeedMultiplier;
+		}
+	}
+	EDITOR_ONLY_bSetAllToDefaultSpeedMultiplier = false;
 	#endif
 }
 

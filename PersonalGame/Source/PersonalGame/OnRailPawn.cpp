@@ -21,12 +21,28 @@ float AOnRailPawn::GetCurrentVelocity() const
 	return 0.f;
 }
 
+void AOnRailPawn::SetPawnSpeedMultiplier(float SpeedMultiplier)
+{
+	if (0.f < SpeedMultiplier)
+	{
+		PawnSpeedMultiplier = SpeedMultiplier;
+		if (RailToFollow != nullptr)
+		{
+			RailToFollow->SetTravelerSpeedMultiplier(PawnSpeedMultiplier);
+		}
+	}
+}
+
 // Called when the game starts or when spawned
 void AOnRailPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	if (RailToFollow != nullptr)
 	{
+		if (!bStartMovingOnBeginPlay)
+		{
+			StopPawnMoving();
+		}
 		RailToFollow->SetTravelerSpeedMultiplier(PawnSpeedMultiplier);
 		FVector NewPos = RailToFollow->GetCurrentLocation();
 		if (bUpdateRotationWithSpline)

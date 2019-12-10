@@ -17,18 +17,21 @@ public:
 	AEnemyProjectileActor();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shootable")
 	void OnShot(float Damage, FVector HitLocation, const TArray<FName> &ComponentTags);
+	UFUNCTION(BlueprintCallable)
+	void SetTimeToHitPlayer(float TTHP);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UParticleSystemComponent * ProjectileFX;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USphereComponent * ProjectileSphere;
 	UPROPERTY(EditAnywhere)
 	float DamageToDeal;
+	//the time from the projectile starting to move on the spline until it hits the player
 	UPROPERTY(EditAnywhere)
-	float SpeedMultiplier;
+	float TimeToHitPlayer = 3;
 	bool bMoveProjectileAlongSpline;
 	class USplineComponent * ArcSpline;
 	float CurrentDistanceAlongSpline;

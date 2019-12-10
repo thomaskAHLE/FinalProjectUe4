@@ -113,4 +113,6 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	bool EDITOR_ONLY_bUpdateDefaultSpeedMultiplier = false;
+	UPROPERTY(EditAnywhere)
+	bool EDITOR_ONLY_bSetAllToDefaultSpeedMultiplier = false;
 };

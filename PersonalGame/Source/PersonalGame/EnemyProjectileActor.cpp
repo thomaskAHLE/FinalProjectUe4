@@ -24,6 +24,12 @@ AEnemyProjectileActor::AEnemyProjectileActor()
 
 }
 
+void AEnemyProjectileActor::SetTimeToHitPlayer(float TTHP)
+{
+	TimeToHitPlayer = TTHP;
+}
+
+
 void AEnemyProjectileActor::OnShot_Implementation(float Damage, FVector HitLocation, const TArray<FName> &ComponentTags)
 {
 	ProjectileSphere->SetGenerateOverlapEvents(false);
@@ -54,7 +60,7 @@ void AEnemyProjectileActor::Tick(float DeltaTime)
 	{
 		if (CurrentDistanceAlongSpline < SplineLength)
 		{
-			MoveAlongSpline(DeltaTime * SpeedMultiplier);
+			MoveAlongSpline(DeltaTime * SplineLength / TimeToHitPlayer);
 		}
 		else
 		{

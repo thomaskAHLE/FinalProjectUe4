@@ -21,6 +21,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentVelocity() const;
 
+	UFUNCTION(BlueprintCallable)
+	void SetPawnSpeedMultiplier(float SpeedMultiplier);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -30,6 +33,10 @@ protected:
 	//Set to change speed of instanced pawn
 	UPROPERTY(EditAnywhere)
 	float PawnSpeedMultiplier = 1.f;
+
+	UPROPERTY(EditAnywhere)
+		bool bStartMovingOnBeginPlay = false;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
