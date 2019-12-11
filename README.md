@@ -7,7 +7,10 @@ Thomas Hill<br>
 Jalon Jackson<br>
 
 This is our submission for Assignment #9. (The Path Less Traveled)<br>
+Please run game through building Visual Studio solution. 
+
 It's a continuation of our previous project.
+Video Walkthrough: https://youtu.be/b9tL_XWvfqc
 
 ## Individual Roles:
 * <b>Diamonick Dunn:</b>
@@ -21,7 +24,15 @@ It's a continuation of our previous project.
   * general brainstroming with Jackson, Thomas, and Diamonick regarding implementation of mechanics (primarily some very basic psuedo code for the zombie spit projectile)
   
 * <b>Jackson Oberkirch:</b>
-  * (Insert text here)
+  * Found and implemented sound effects for player damage, zombie damage, zombie death, zombie attack 
+  * Found and implemented none licenced background music by placing a sound que within the level 
+  * Worked on zombie encounters and zombie placement 
+  * Added spotlight for every zombie type to increase visabilty and improve playability 
+  * Worked with Thomas on cpp and blueprints for AI zombie, player death, enemey controller, etc. 
+  * Worked with Sarah on fine tuning animations and delays 
+  * Served as game tester to find bugs and anomalies
+  * Recorded and uploaded video walkthrough 
+  * Setup meetup times 
   
 * <b>Thomas Hill:</b>
   * (Insert text here)
