@@ -35,7 +35,14 @@ Video Walkthrough: https://youtu.be/b9tL_XWvfqc
   * Setup meetup times 
   
 * <b>Thomas Hill:</b>
-  * (Insert text here)
+  * Refactored enemy logic into EnemyLogicComponent and EnemyAttackComponent
+  * Created new enemy types: AI Enemy that moves to the player on a nav mesh, and Stationary Enemy, thats stays in place and attacks
+  * Added ranged attack type for enemies, And enemy projectiles that move toward player.
+  * Added damage multiplier based on consecutive shots without getting hit, and put a collision on enemies heads so they take more damage on headshot.
+  * Updated Player UI to show damage multipler and the number of enemies killed.
+  * Added particle effects to zombies, targets and enemy projectiles to show when they are hit.
+  * Rewrote EnemyEncounter class to be able to control enemies of any type. 
+  * Rewrote code to reduce coupling by using delegate events 
   
 * <b>Jalon Jackson:</b>
   * (Insert text here)
