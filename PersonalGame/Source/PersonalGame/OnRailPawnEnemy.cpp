@@ -129,18 +129,12 @@ bool AOnRailPawnEnemy::IsMoving_Implementation()
 
 void AOnRailPawnEnemy::StartMoving()
 {
-	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
-	{
-		RailToFollow->StopMoving();
-	}
+	StartPawnMoving();
 }
 
 void AOnRailPawnEnemy::StopMoving()
 {
-	if (RailToFollow != nullptr && !RailToFollow->HasReachedEndOfRail())
-	{
-		RailToFollow->StartMoving();
-	}
+	StopPawnMoving();
 }
 
 void AOnRailPawnEnemy::DestroyWrapper()

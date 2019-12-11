@@ -54,7 +54,8 @@ public:
 protected:
 
 
-	
+	UPROPERTY(EditAnywhere)
+	bool bStartMovingOnBeginPlay = false;
 
 	UPROPERTY(EditAnywhere)
 	float HeadShotMultiplier = 2.f;
