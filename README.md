@@ -14,7 +14,11 @@ It's a continuation of our previous project.
   * (Insert text here)
   
 * <b>Sarah Kent:</b>
-  * (Insert text here)
+  * found, edited, and implemented new animations for four zombie models/skeletons (zombie spit, zombie run, zombie sprint, zombie agonize)
+  * imported two new zombie models, created anim blueprints and blendspaces for new models set up all animations for new models (idle, walk, melee attack, hit reaction, death, true death)
+  * worked with Jackson and Thomas to debug zombie agonize animation implementation in all ranged on rails anim blueprints
+  * imported all new "farmstuff" models, renamed and reorganized models, textures, and materials as needed
+  * general brainstroming with Jackson, Thomas, and Diamonick regarding implementation of mechanics (primarily some very basic psuedo code for the zombie spit projectile)
   
 * <b>Jackson Oberkirch:</b>
   * (Insert text here)
