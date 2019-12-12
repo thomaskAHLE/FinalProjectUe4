@@ -36,7 +36,7 @@ Video Walkthrough: https://youtu.be/b9tL_XWvfqc
   * Added spotlight for every zombie type to increase visibilty and improve playability 
   * Worked with Thomas on cpp and blueprints for AI zombie, player death, enemey controller, etc. 
   * Worked with Sarah on fine tuning animations and delays 
-  * Worked with Jalon as game tester to find bugs and anomalies
+  * Served as game tester to find bugs and anomalies
   * Recorded and uploaded video walkthrough 
   * Setup meetup times 
   
