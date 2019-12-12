@@ -46,7 +46,7 @@ Video Walkthrough: https://youtu.be/b9tL_XWvfqc
   * Added ranged attack type for enemies, And enemy projectiles that move toward player.
   * Added damage multiplier based on consecutive shots without getting hit, and put a collision on enemies heads so they take more damage on headshot.
   * Updated Player UI to show damage multipler and the number of enemies killed.
-  * Added particle effects to zombies, targets and enemy helped Jalon to add projectiles and show when they are hit.
+  * Added particle effects to zombies, targets and to show when they are shot.
   * Rewrote EnemyEncounter class to be able to control enemies of any type. 
   * Rewrote code to reduce coupling by using delegate events 
   
