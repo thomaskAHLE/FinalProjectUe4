@@ -27,7 +27,7 @@ Video Walkthrough: https://youtu.be/b9tL_XWvfqc
   * Imported two new zombie models, created anim blueprints and blendspaces for new models set up all animations for new models (idle, walk, melee attack, hit reaction, death, true death)
   * Worked with Jackson and Thomas to debug zombie agonize animation implementation in all ranged on rails anim blueprints
   * Imported all new "farmstuff" models, renamed and reorganized models, textures, and materials as needed
-  * General brainstroming with Jackson, Jalon, Thomas, and Diamonick regarding implementation of mechanics (primarily some very basic psuedo code for the zombie spit projectile)
+  * General brainstroming with Jackson, Thomas, and Diamonick regarding implementation of mechanics (primarily some very basic psuedo code for the zombie spit projectile)
   
 * <b>Jackson Oberkirch:</b>
   * Found and implemented sound effects for player damage, zombie damage, zombie death, zombie attack 
