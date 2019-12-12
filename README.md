@@ -20,14 +20,14 @@ Video Walkthrough: https://youtu.be/b9tL_XWvfqc
   * Created a burning zombie. The only difference is that it runs pretty fast towards the player.
   * Made a new bridge static mesh.
   * Organized the world outliner and Content folder.
-  * Served as level designer for the project.
+  * Assisted Jalon with level design for the project.
   
 * <b>Sarah Kent:</b>
   * Found, edited, and implemented new animations for four zombie models/skeletons (zombie spit, zombie run, zombie sprint, zombie agonize)
   * Imported two new zombie models, created anim blueprints and blendspaces for new models set up all animations for new models (idle, walk, melee attack, hit reaction, death, true death)
   * Worked with Jackson and Thomas to debug zombie agonize animation implementation in all ranged on rails anim blueprints
   * Imported all new "farmstuff" models, renamed and reorganized models, textures, and materials as needed
-  * General brainstroming with Jackson, Thomas, and Diamonick regarding implementation of mechanics (primarily some very basic psuedo code for the zombie spit projectile)
+  * General brainstroming with Jackson, Jalon, Thomas, and Diamonick regarding implementation of mechanics (primarily some very basic psuedo code for the zombie spit projectile)
   
 * <b>Jackson Oberkirch:</b>
   * Found and implemented sound effects for player damage, zombie damage, zombie death, zombie attack 
@@ -36,7 +36,7 @@ Video Walkthrough: https://youtu.be/b9tL_XWvfqc
   * Added spotlight for every zombie type to increase visibilty and improve playability 
   * Worked with Thomas on cpp and blueprints for AI zombie, player death, enemey controller, etc. 
   * Worked with Sarah on fine tuning animations and delays 
-  * Served as game tester to find bugs and anomalies
+  * Worked with Jalon as game tester to find bugs and anomalies
   * Recorded and uploaded video walkthrough 
   * Setup meetup times 
   
@@ -46,12 +46,19 @@ Video Walkthrough: https://youtu.be/b9tL_XWvfqc
   * Added ranged attack type for enemies, And enemy projectiles that move toward player.
   * Added damage multiplier based on consecutive shots without getting hit, and put a collision on enemies heads so they take more damage on headshot.
   * Updated Player UI to show damage multipler and the number of enemies killed.
-  * Added particle effects to zombies, targets and enemy projectiles to show when they are hit.
+  * Added particle effects to zombies, targets and enemy helped Jalon to add projectiles and show when they are hit.
   * Rewrote EnemyEncounter class to be able to control enemies of any type. 
   * Rewrote code to reduce coupling by using delegate events 
   
 * <b>Jalon Jackson:</b>
-  * (Insert text here)
+  * Setup venue for project meetings
+  * Developed projectiles to illustrated enemy attact and environmental elements for background effects.
+  * Implemented user interface with Thomas for zombie damage, attack, and death
+  * Organized environment and level and world outliner for UI/UX funtionality
+  * Baked in-game lighting to add a cast effect, to save time and add more detail into the project.  
+  * Created fire fx for burning zombie girl
+  * Helped Diamonick with level design and incorporated various materials for new scene projectiles.
+  * Worked with Jackson as game tester to find bugs
   
 ## Description
 * Our game is based on on-rail shooters where the camera automatically scrolls, and you're limited by your current field of view.
