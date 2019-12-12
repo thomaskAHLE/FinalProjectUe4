@@ -19,6 +19,7 @@ Video Walkthrough: https://youtu.be/b9tL_XWvfqc
   * Managed zombie placement, enemy encounters, and spline path movement.
   * Created a burning zombie. The only difference is that it runs pretty fast towards the player.
   * Made a new bridge static mesh.
+  * Organized the world outliner and Content folder.
   * Served as level designer for the project.
   
 * <b>Sarah Kent:</b>
